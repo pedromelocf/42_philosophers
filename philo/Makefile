@@ -7,8 +7,8 @@ PHILO_OBJ = $(addprefix $(PHILO_SRC_PATH), $(PHILO_SRCS:.c=.o))
 PHILO_SRCS = main.c
 
 #FLAGS
-FLAGS = -Wall -Werror -Wextra
-CC = gcc -g3
+FLAGS = -Wall -Werror -Wextra -pthread
+CC = gcc -fsanitize=thread
 
 #MESSAGES
 MESSAGE1 = "------------------Compiling philo Objects!-------------------"
