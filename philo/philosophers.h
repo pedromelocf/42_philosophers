@@ -36,11 +36,11 @@ time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n"
 
 typedef struct s_data
 {
-    short int    nb_philos;
-    int          time_to_die;
-    int          time_to_eat;
-    int          time_to_sleep;
-    int          nb_meals_todo;
+    int			nb_philos;
+    int         time_to_die;
+    int         time_to_eat;
+    int         time_to_sleep;
+    int         nb_meals_todo;
 }    t_data;
 
 typedef struct s_philo

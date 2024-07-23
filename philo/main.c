@@ -2,35 +2,46 @@
 
 static void     init_philo(t_philo **philo, int argc, char **argv);
 static int      ft_atoi(const char *nptr);
-static void handle_exit(char *str, int status);
+static void 	handle_exit(char *str, int status);
 
 int main(int argc, char **argv)
 {
     t_philo    *philo;
 
     init_philo(&philo, argc, argv);
-    printf(THINKING, philo->data->nb_philos, philo->philo_id);
+	printf(THINKING, philo->data->nb_philos, philo->philo_id);
+	//philo = philo->next;
     return (0);
 }
 
 static void    init_philo(t_philo **philo, int argc, char **argv)
 {
-    if (argc != 5 && argc != 6)
-        handle_exit(EXPECTED_ARGS, 1);
-    memset(*philo, 0, sizeof(t_philo));
-    (*philo)->data->nb_philos = ft_atoi(argv[1]);
-    (*philo)->data->time_to_die = ft_atoi(argv[2]);
-    (*philo)->data->time_to_eat = ft_atoi(argv[3]);
-    (*philo)->data->time_to_sleep = ft_atoi(argv[4]);
-    if (argc == 6)
-        (*philo)->data->nb_philos = ft_atoi(argv[5]);
-    (*philo)->nb_meals_done = 0;
-    (*philo)->philo_id = 1;
+	int		i;
+	t_data	*data;
+
+	i = 0;
+    if(argc != 5 && argc != 6)
+		handle_exit(EXPECTED_ARGS, 1);
+	data = &(t_data){
+			ft_atoi(argv[1]), ft_atoi(argv[2]),ft_atoi(argv[3]),
+			ft_atoi(argv[4]), 0
+	};
+	if (argc == 6)
+		data->nb_meals_todo = ft_atoi(argv[5]);
+	while (i++ < data->nb_philos)
+	{
+		(*philo) = malloc(sizeof(t_philo));
+		memset((*philo), 0, sizeof(t_philo));
+		(*philo)->data = data;
+		(*philo)->nb_meals_done = 0;
+		(*philo)->philo_id = (short int)i;
+		(*philo) = (*philo)->next;
+	}
 }
 
 static void handle_exit(char *str, int status)
 {
-    printf(str);
+    printf("%s", str);
     exit(status);
 }
 
