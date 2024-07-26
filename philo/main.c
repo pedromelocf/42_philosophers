@@ -1,12 +1,16 @@
 #include "philosophers.h"
 
-static void    init_diner(t_diner **diner, int argc, char **argv);
+static void     init_diner(t_diner **diner, int argc, char **argv);
 static int      ft_atoi(const char *nptr);
 static void 	handle_exit(char *str, int status);
 static void     dining(t_diner **diner);
 static void		*philos_routine(void *arg);
 static void		*supervisor_routine(void *arg);
-
+static void 	clean_diner(t_diner **diner);
+static void 	sleeping(int philo_id, t_diner **diner);
+static void 	taking_fork(int philo_id, t_diner **diner);
+static void 	eating(int philo_id, t_diner **diner);
+static void 	thinking(int philo_id, t_diner **diner);
 
 int main(int argc, char **argv)
 {
@@ -14,24 +18,30 @@ int main(int argc, char **argv)
 
     init_diner(&diner, argc, argv);
     dining(&diner);
+	clean_diner(&diner);
     return (0);
 }
 
 static void	*supervisor_routine(void *arg)
 {
     t_diner **diner;
+	int i;
 
     diner = (t_diner **)arg;
-    while (1)
+    while ((*diner)->supervisor->alive == TRUE)
     {
-        pthread_mutex_lock(&(*diner)->philos[0].philo_mutex);
-        if ((*diner)->philos[0].nb_meals_done >= (*diner)->data->nb_meals_todo)
-        {
-            (*diner)->supervisor->alive = FALSE;
-            break;
-        }
-        usleep(1);
-        pthread_mutex_unlock(&(*diner)->philos[0].philo_mutex);
+		i = 0;
+		while (i < (*diner)->data->nb_philos && (*diner)->supervisor->alive == TRUE)
+		{
+			pthread_mutex_lock(&(*diner)->philos[i].philo_mutex);
+			if (actual_time - (*diner)->philos[i].time_since_beggin_last_meal > (*diner)->data->time_to_die)
+			{
+				(*diner)->supervisor->alive = FALSE;
+				break;
+			}
+			pthread_mutex_unlock(&(*diner)->philos[i].philo_mutex);
+			i++;
+		}
     }
     return(NULL);
 }
@@ -41,33 +51,57 @@ static void	*philos_routine(void *arg)
     t_diner **diner;
 
     diner = (t_diner **)arg;
-    while (1)
+    while ((*diner)->supervisor->alive)
     {
-        if ((*diner)->supervisor->alive == FALSE)
-        {
-            printf("SUP OWNS!\n");
-            break;
-        }
-        pthread_mutex_lock(&(*diner)->philos[0].philo_mutex);
-        printf("%d\n", (*diner)->philos[0].nb_meals_done);
-       (*diner)->philos[0].nb_meals_done++;
-        pthread_mutex_unlock(&(*diner)->philos[0].philo_mutex);
-        usleep(1);
+		if((*diner)->philos->philo_id % 2 == 0)
+			sleeping((*diner)->philos->philo_id, diner);
+		taking_fork((*diner)->philos->philo_id, diner);
+		eating((*diner)->philos->philo_id, diner);
+		sleeping((*diner)->philos->philo_id, diner);
+		thinking((*diner)->philos->philo_id, diner);
     }
     return (NULL);
 }
 
+static void eating(int philo_id, t_diner **diner)
+{
+	printf(EATING, diner->timestamp, philo_id);
+	(*diner)->philos->time_since_beggin_last_meal = actual_time;
+	usleep((*diner)->data->time_to_eat);
+	(*diner)->philos->nb_meals_done++;
+	pthread_mutex_unlock(&(*diner)->philos[philo_id].philo_mutex);
+	pthread_mutex_unlock(&(*diner)->philos[philo_id].left_fork->fork_mutex);
+	pthread_mutex_unlock(&(*diner)->philos[philo_id].right_fork->fork_mutex);
+}
+
+static void thinking(int philo_id, t_diner **diner)
+{
+	printf(THINKING, diner->timestamp, philo_id);
+	usleep(1);
+}
+
+static void taking_fork(int philo_id, t_diner **diner)
+{
+	pthread_mutex_lock(&(*diner)->philos[philo_id].philo_mutex);
+	pthread_mutex_lock(&(*diner)->philos[philo_id].left_fork->fork_mutex);
+	pthread_mutex_lock(&(*diner)->philos[philo_id].right_fork->fork_mutex);
+	printf(TAKEN_FORK, diner->timestamp, philo_id);
+}
+
+static void sleeping(int philo_id, t_diner **diner)
+{
+	printf(SLEEPING, diner->timestamp, philo_id);
+	usleep((*diner)->data->time_to_sleep);
+}
+
 static void dining(t_diner **diner)
 {
-    pthread_create(&(*diner)->supervisor->supervisor_pthread, NULL, &supervisor_routine, diner);
-    pthread_create(&(*diner)->philos->philo_pthread, NULL, &philos_routine, diner);
-    pthread_join((*diner)->supervisor->supervisor_pthread, NULL);
-    pthread_join((*diner)->philos->philo_pthread, NULL);
+
 }
 
 static void    init_diner(t_diner **diner, int argc, char **argv)
 {
-    int i = 0;
+    short int i = 0;
 
 	if(argc != 5 && argc != 6)
 		handle_exit(EXPECTED_ARGS, 1);
@@ -83,48 +117,47 @@ static void    init_diner(t_diner **diner, int argc, char **argv)
     (*diner)->supervisor = calloc(1, sizeof(t_supervisor));
     (*diner)->supervisor->alive = TRUE;
     (*diner)->supervisor->dining_info = *diner;
+	pthread_mutex_init(&(*diner)->supervisor->supervisor_mutex, NULL);
     (*diner)->philos = calloc(1, sizeof(t_philos) * (*diner)->data->nb_philos);
     (*diner)->fork = calloc(1, sizeof(t_fork) * (*diner)->data->nb_philos);
     while (i < (*diner)->data->nb_philos)
     {
-        (*diner)->philos[i].alive = TRUE;
+		pthread_mutex_init(&(*diner)->philos[i].philo_mutex, NULL);
         (*diner)->philos[i].philo_id = i + 1;
         (*diner)->philos[i].time_since_beggin_last_meal = 0;
         (*diner)->philos[i].nb_meals_done = 0;
         (*diner)->philos[i].left_fork = &(*diner)->fork[i + 1];
         (*diner)->philos[i].right_fork = &(*diner)->fork[i + 2 % (*diner)->data->nb_philos];
-        pthread_mutex_init(&(*diner)->philos[i].philo_mutex, NULL);
-        // pthread_mutex_init(&(*diner)->fork[i].fork_mutex, NULL);
-        (*diner)->fork[i].status = NOT_IN_USE;
+        pthread_mutex_init(&(*diner)->fork[i].fork_mutex, NULL);
         i++;
     }
 }
 
-//
-// int main(int argc, char **argv)
-// {
-// 	t_test *test;
-// 	pthread_t thread1;
-// 	pthread_t thread2;
-// 	pthread_t thread3;
-//
-// 	test =  malloc(sizeof(t_test));
-// 	test->i = 0;
-// 	test->stop = 0;
-// 	pthread_mutex_init(&test->mutex, NULL);
-// 	pthread_create(&thread1, NULL, &philo_routine, test);
-// 	pthread_create(&thread2, NULL, &philo_routine, test);
-// 	pthread_create(&thread3, NULL, &supervisor_routine, test);
-// 	pthread_join(thread1, NULL);
-// 	pthread_join(thread2, NULL);
-// 	pthread_join(thread3, NULL);
-// 	pthread_mutex_destroy(&test->mutex);
-// 	return (0);
-// }
-//
+static void clean_diner(t_diner **diner)
+{
+	short int nb_philos = (*diner)->data->nb_philos;
+	short int i = 0;
 
-//
-
+	if ((*diner)->data)
+		free((*diner)->data);
+	if ((*diner)->supervisor)
+	{
+		pthread_mutex_destroy(&(*diner)->supervisor->supervisor_mutex);
+		free((*diner)->supervisor);
+	}
+	while (i < nb_philos)
+	{
+		pthread_mutex_destroy(&(*diner)->philos[i].philo_mutex);
+		pthread_mutex_destroy(&(*diner)->fork[i].fork_mutex);
+		i++;
+	}
+	if ((*diner)->philos)
+		free((*diner)->philos);
+	if ((*diner)->fork)
+		free((*diner)->fork);
+	if(*diner)
+		free(*diner);
+}
 
 static void handle_exit(char *str, int status)
 {
