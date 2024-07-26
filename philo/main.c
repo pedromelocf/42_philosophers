@@ -3,7 +3,8 @@
 static void    init_diner(t_diner **diner, int argc, char **argv);
 static int      ft_atoi(const char *nptr);
 static void 	handle_exit(char *str, int status);
-static void		*philo_routine(void *arg);
+static void     dining(t_diner **diner);
+static void		*philos_routine(void *arg);
 static void		*supervisor_routine(void *arg);
 
 
@@ -12,7 +13,56 @@ int main(int argc, char **argv)
     t_diner    *diner;
 
     init_diner(&diner, argc, argv);
+    dining(&diner);
     return (0);
+}
+
+static void	*supervisor_routine(void *arg)
+{
+    t_diner **diner;
+
+    diner = (t_diner **)arg;
+    while (1)
+    {
+        pthread_mutex_lock(&(*diner)->philos[0].philo_mutex);
+        if ((*diner)->philos[0].nb_meals_done >= (*diner)->data->nb_meals_todo)
+        {
+            (*diner)->supervisor->alive = FALSE;
+            break;
+        }
+        usleep(1);
+        pthread_mutex_unlock(&(*diner)->philos[0].philo_mutex);
+    }
+    return(NULL);
+}
+
+static void	*philos_routine(void *arg)
+{
+    t_diner **diner;
+
+    diner = (t_diner **)arg;
+    while (1)
+    {
+        if ((*diner)->supervisor->alive == FALSE)
+        {
+            printf("SUP OWNS!\n");
+            break;
+        }
+        pthread_mutex_lock(&(*diner)->philos[0].philo_mutex);
+        printf("%d\n", (*diner)->philos[0].nb_meals_done);
+       (*diner)->philos[0].nb_meals_done++;
+        pthread_mutex_unlock(&(*diner)->philos[0].philo_mutex);
+        usleep(1);
+    }
+    return (NULL);
+}
+
+static void dining(t_diner **diner)
+{
+    pthread_create(&(*diner)->supervisor->supervisor_pthread, NULL, &supervisor_routine, diner);
+    pthread_create(&(*diner)->philos->philo_pthread, NULL, &philos_routine, diner);
+    pthread_join((*diner)->supervisor->supervisor_pthread, NULL);
+    pthread_join((*diner)->philos->philo_pthread, NULL);
 }
 
 static void    init_diner(t_diner **diner, int argc, char **argv)
@@ -43,7 +93,8 @@ static void    init_diner(t_diner **diner, int argc, char **argv)
         (*diner)->philos[i].nb_meals_done = 0;
         (*diner)->philos[i].left_fork = &(*diner)->fork[i + 1];
         (*diner)->philos[i].right_fork = &(*diner)->fork[i + 2 % (*diner)->data->nb_philos];
-        pthread_mutex_init(&(*diner)->fork[i].fork_mutex, NULL);
+        pthread_mutex_init(&(*diner)->philos[i].philo_mutex, NULL);
+        // pthread_mutex_init(&(*diner)->fork[i].fork_mutex, NULL);
         (*diner)->fork[i].status = NOT_IN_USE;
         i++;
     }
@@ -71,43 +122,9 @@ static void    init_diner(t_diner **diner, int argc, char **argv)
 // 	return (0);
 // }
 //
-// static void	*philo_routine(void *arg)
-// {
-// 	t_test *test = (t_test *)arg;
+
 //
-// 	while (test->i < 500000)
-// 	{
-// 		pthread_mutex_lock(&test->mutex);
-// 		if(test->stop == 1)
-// 		{
-// 			pthread_mutex_unlock(&test->mutex);
-// 			break;
-// 		}
-// 		printf("%d\n", test->i);
-// 		test->i++;
-// 		pthread_mutex_unlock(&test->mutex);
-// 		usleep(1);
-// 	}
-// 	return (NULL);
-// }
-//
-// static void	*supervisor_routine(void *arg)
-// {
-// 	t_test *test = (t_test *)arg;
-// 	while (1)
-// 	{
-// 		pthread_mutex_lock(&test->mutex);
-// 		if (test->i >= 34908)
-// 		{
-// 			printf("SUP!\n\n");
-// 			test->stop = 1;
-// 			pthread_mutex_unlock(&test->mutex);
-// 			break;
-// 		}
-// 		pthread_mutex_unlock(&test->mutex);
-// 	}
-// 	return(NULL);
-// }
+
 
 static void handle_exit(char *str, int status)
 {

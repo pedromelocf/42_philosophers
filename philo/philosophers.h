@@ -76,6 +76,8 @@ typedef struct s_philos
 {
     t_fork          *left_fork;
     t_fork          *right_fork;
+    pthread_t       philo_pthread;
+    pthread_mutex_t philo_mutex;
     short int       philo_id;
     short int       alive;
     int             time_since_beggin_last_meal;
@@ -93,6 +95,7 @@ typedef struct s_diner
 typedef struct s_supervisor
 {
     short int       alive;
+    pthread_t       supervisor_pthread;
     t_diner         *dining_info;
 }  t_supervisor;
 
