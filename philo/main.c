@@ -11,6 +11,7 @@ static void 	sleeping(int philo_id, t_diner **diner);
 static void 	taking_fork(int philo_id, t_diner **diner);
 static void 	eating(int philo_id, t_diner **diner);
 static void 	thinking(int philo_id, t_diner **diner);
+static long int get_time_stamp(void);
 
 int main(int argc, char **argv)
 {
@@ -22,25 +23,36 @@ int main(int argc, char **argv)
     return (0);
 }
 
+static long int get_time_stamp(void)
+{
+	struct timeval time;
+
+	gettimeofday(&time, NULL);
+	return(time.tv_sec * 1000 + time.tv_usec / 1000);
+}
+
 static void	*supervisor_routine(void *arg)
 {
     t_diner **diner;
 	int i;
 
     diner = (t_diner **)arg;
-    while ((*diner)->supervisor->alive == TRUE)
+    while ((*diner)->supervisor->alive)
     {
 		i = 0;
-		while (i < (*diner)->data->nb_philos && (*diner)->supervisor->alive == TRUE)
+		while (i < (*diner)->data->nb_philos && (*diner)->supervisor->alive)
 		{
 			pthread_mutex_lock(&(*diner)->philos[i].philo_mutex);
-			if (actual_time - (*diner)->philos[i].time_since_beggin_last_meal > (*diner)->data->time_to_die)
+			if (get_time_stamp() - (*diner)->philos[i].time_since_beggin_last_meal > (*diner)->data->time_to_die)
 			{
+				printf("SUP OWN THIS SH*T!\n\n");
 				(*diner)->supervisor->alive = FALSE;
+				pthread_mutex_unlock(&(*diner)->philos[i].philo_mutex);
 				break;
 			}
 			pthread_mutex_unlock(&(*diner)->philos[i].philo_mutex);
 			i++;
+			usleep(1000100);
 		}
     }
     return(NULL);
@@ -65,9 +77,9 @@ static void	*philos_routine(void *arg)
 
 static void eating(int philo_id, t_diner **diner)
 {
-	printf(EATING, diner->timestamp, philo_id);
-	(*diner)->philos->time_since_beggin_last_meal = actual_time;
-	usleep((*diner)->data->time_to_eat);
+	printf(EATING, get_time_stamp() - (*diner)->time, philo_id);
+	(*diner)->philos->time_since_beggin_last_meal = get_time_stamp();
+	usleep((*diner)->data->time_to_eat / 1000);
 	(*diner)->philos->nb_meals_done++;
 	pthread_mutex_unlock(&(*diner)->philos[philo_id].philo_mutex);
 	pthread_mutex_unlock(&(*diner)->philos[philo_id].left_fork->fork_mutex);
@@ -76,7 +88,7 @@ static void eating(int philo_id, t_diner **diner)
 
 static void thinking(int philo_id, t_diner **diner)
 {
-	printf(THINKING, diner->timestamp, philo_id);
+	printf(THINKING, get_time_stamp() - (*diner)->time, philo_id);
 	usleep(1);
 }
 
@@ -85,18 +97,33 @@ static void taking_fork(int philo_id, t_diner **diner)
 	pthread_mutex_lock(&(*diner)->philos[philo_id].philo_mutex);
 	pthread_mutex_lock(&(*diner)->philos[philo_id].left_fork->fork_mutex);
 	pthread_mutex_lock(&(*diner)->philos[philo_id].right_fork->fork_mutex);
-	printf(TAKEN_FORK, diner->timestamp, philo_id);
+	printf(TAKEN_FORK, get_time_stamp() - (*diner)->time, philo_id);
 }
 
 static void sleeping(int philo_id, t_diner **diner)
 {
-	printf(SLEEPING, diner->timestamp, philo_id);
-	usleep((*diner)->data->time_to_sleep);
+	printf(SLEEPING, get_time_stamp() - (*diner)->time, philo_id);
+	usleep((*diner)->data->time_to_sleep / 1000);
 }
 
 static void dining(t_diner **diner)
 {
+	int i = 0;
 
+	pthread_create(&(*diner)->supervisor->supervisor_pthread, NULL, &supervisor_routine, diner);
+	while (i < (*diner)->data->nb_philos)
+	{
+		(*diner)->philos->time_since_beggin_last_meal = get_time_stamp();
+		pthread_create(&(*diner)->philos[i].philo_pthread, NULL, &philos_routine, diner);
+		i++;
+	}
+	pthread_join((*diner)->supervisor->supervisor_pthread, NULL);
+	i = 0;
+	while (i < (*diner)->data->nb_philos)
+	{
+		pthread_join((*diner)->philos[i].philo_pthread, NULL);
+		i++;
+	}
 }
 
 static void    init_diner(t_diner **diner, int argc, char **argv)
@@ -117,6 +144,7 @@ static void    init_diner(t_diner **diner, int argc, char **argv)
     (*diner)->supervisor = calloc(1, sizeof(t_supervisor));
     (*diner)->supervisor->alive = TRUE;
     (*diner)->supervisor->dining_info = *diner;
+	(*diner)->time = get_time_stamp();
 	pthread_mutex_init(&(*diner)->supervisor->supervisor_mutex, NULL);
     (*diner)->philos = calloc(1, sizeof(t_philos) * (*diner)->data->nb_philos);
     (*diner)->fork = calloc(1, sizeof(t_fork) * (*diner)->data->nb_philos);
