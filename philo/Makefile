@@ -4,7 +4,12 @@ PHILO_SRC_PATH = ./
 PHILO_INCLUDES = ./philosophers.h
 PHILO_OBJ = $(addprefix $(PHILO_SRC_PATH), $(PHILO_SRCS:.c=.o))
 
-PHILO_SRCS = main.c
+PHILO_SRCS = diner.c \
+	main.c \
+	manage_diner.c \
+	philo_utils.c \
+	philos.c \
+	routines.c
 
 #FLAGS -fsanitize=thread
 FLAGS = -Wall -Werror -Wextra -pthread

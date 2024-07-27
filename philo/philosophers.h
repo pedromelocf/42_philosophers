@@ -84,4 +84,17 @@ typedef struct s_supervisor
     t_diner         *dining_info;
 }  t_supervisor;
 
+void        init_diner(t_diner **diner, int argc, char **argv);
+int         ft_atoi(const char *nptr);
+void 	    handle_exit(char *str, int status);
+void        dining(t_diner **diner);
+void	    *philos_routine(void *arg);
+void	    *supervisor_routine(void *arg);
+void 	    clean_diner(t_diner **diner);
+void 	    sleeping(int philo_id, t_diner **diner);
+void       	taking_fork(int philo_id, t_diner **diner);
+void 	    eating(int philo_id, t_diner **diner);
+void 	    thinking(int philo_id, t_diner **diner);
+long int    get_time_stamp(void);
+
 #endif
