@@ -4,7 +4,7 @@ PHILO_SRC_PATH = ./
 PHILO_INCLUDES = ./philosophers.h
 PHILO_OBJ = $(addprefix $(PHILO_SRC_PATH), $(PHILO_SRCS:.c=.o))
 
-PHILO_SRCS = diner.c \
+PHILO_SRCS = dining.c \
 	main.c \
 	manage_diner.c \
 	philo_utils.c \

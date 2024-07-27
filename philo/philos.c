@@ -1,32 +1,32 @@
 #include "philosophers.h"
 
-void eating(int philo_id, t_diner **diner)
+void eating(t_philos *philos)
 {
-    printf(EATING, get_time_stamp() - (*diner)->time, philo_id);
-    (*diner)->philos->time_since_beggin_last_meal = get_time_stamp();
-    usleep((*diner)->data->time_to_eat / 1000);
-    (*diner)->philos->nb_meals_done++;
-    pthread_mutex_unlock(&(*diner)->philos[philo_id].philo_mutex);
-    pthread_mutex_unlock(&(*diner)->philos[philo_id].left_fork->fork_mutex);
-    pthread_mutex_unlock(&(*diner)->philos[philo_id].right_fork->fork_mutex);
+    printf(EATING, get_time_stamp() - philos->init_diner_time, philos->philo_id);
+    philos->time_since_beggin_last_meal = get_time_stamp();
+    usleep(philos->data->time_to_eat * 1000);
+    philos->nb_meals_done++;
+    pthread_mutex_unlock(&philos->philo_mutex);
+    pthread_mutex_unlock(&philos->left_fork->fork_mutex);
+    pthread_mutex_unlock(&philos->right_fork->fork_mutex);
 }
 
-void thinking(int philo_id, t_diner **diner)
+void thinking(t_philos *philos)
 {
-    printf(THINKING, get_time_stamp() - (*diner)->time, philo_id);
+    printf(THINKING, get_time_stamp() - philos->init_diner_time, philos->philo_id);
     usleep(1);
 }
 
-void taking_fork(int philo_id, t_diner **diner)
+void taking_fork(t_philos *philos)
 {
-    pthread_mutex_lock(&(*diner)->philos[philo_id].philo_mutex);
-    pthread_mutex_lock(&(*diner)->philos[philo_id].left_fork->fork_mutex);
-    pthread_mutex_lock(&(*diner)->philos[philo_id].right_fork->fork_mutex);
-    printf(TAKEN_FORK, get_time_stamp() - (*diner)->time, philo_id);
+    pthread_mutex_lock(&philos->philo_mutex);
+    pthread_mutex_lock(&philos->left_fork->fork_mutex);
+    pthread_mutex_lock(&philos->right_fork->fork_mutex);
+    printf(TAKEN_FORK, get_time_stamp() - philos->init_diner_time, philos->philo_id);
 }
 
-void sleeping(int philo_id, t_diner **diner)
+void sleeping(t_philos *philos)
 {
-    printf(SLEEPING, get_time_stamp() - (*diner)->time, philo_id);
-    usleep((*diner)->data->time_to_sleep / 1000);
+    printf(SLEEPING, get_time_stamp() - philos->init_diner_time, philos->philo_id);
+    usleep(philos->data->time_to_sleep / 2 * 1000);
 }

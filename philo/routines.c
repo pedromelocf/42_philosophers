@@ -2,17 +2,19 @@
 
 void	*philos_routine(void *arg)
 {
-    t_diner **diner;
+    t_philos *philos;
 
-    diner = (t_diner **)arg;
-    while ((*diner)->supervisor->alive)
+    philos = (t_philos *)arg;
+    while (philos->philo_alive == TRUE)
     {
-        if((*diner)->philos->philo_id % 2 == 0)
-            sleeping((*diner)->philos->philo_id, diner);
-        taking_fork((*diner)->philos->philo_id, diner);
-        eating((*diner)->philos->philo_id, diner);
-        sleeping((*diner)->philos->philo_id, diner);
-        thinking((*diner)->philos->philo_id, diner);
+        philos->time_since_beggin_last_meal = get_time_stamp();
+        if(philos->philo_id % 2 == 0)
+            sleeping(philos);
+        taking_fork(philos);
+        eating(philos);
+        sleeping(philos);
+        thinking(philos);
+        usleep(1);
     }
     return (NULL);
 }
@@ -28,17 +30,18 @@ void	*supervisor_routine(void *arg)
         i = 0;
         while (i < (*diner)->data->nb_philos && (*diner)->supervisor->alive)
         {
-            pthread_mutex_lock(&(*diner)->philos[i].philo_mutex);
-            if (get_time_stamp() - (*diner)->philos[i].time_since_beggin_last_meal > (*diner)->data->time_to_die)
+            pthread_mutex_lock(&(*diner)->philos[i]->philo_mutex);
+            if (get_time_stamp() - (*diner)->philos[i]->time_since_beggin_last_meal > (*diner)->data->time_to_die)
             {
                 printf("SUP OWN THIS SH*T!\n\n");
                 (*diner)->supervisor->alive = FALSE;
-                pthread_mutex_unlock(&(*diner)->philos[i].philo_mutex);
+                (*diner)->philos[i]->philo_alive = FALSE;
+                pthread_mutex_unlock(&(*diner)->philos[i]->philo_mutex);
                 break;
             }
-            pthread_mutex_unlock(&(*diner)->philos[i].philo_mutex);
+            pthread_mutex_unlock(&(*diner)->philos[i]->philo_mutex);
             i++;
-            usleep(1000100);
+            usleep(1);
         }
     }
     return(NULL);

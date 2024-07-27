@@ -65,15 +65,19 @@ typedef struct s_philos
     short int       philo_id;
     long int        time_since_beggin_last_meal;
     int             nb_meals_done;
+    long int		init_thread_time;
+    long int        init_diner_time;
+    short int       philo_alive;
+    struct s_data   *data;
 }    t_philos;
 
 typedef struct s_diner
 {
     struct s_supervisor *supervisor;
-    struct s_philos     *philos;
+    struct s_philos     **philos;
     struct s_data       *data;
     struct s_fork       *fork;
-	long int			time;
+    long int            time;
 }   t_diner;
 
 typedef struct s_supervisor
@@ -91,10 +95,10 @@ void        dining(t_diner **diner);
 void	    *philos_routine(void *arg);
 void	    *supervisor_routine(void *arg);
 void 	    clean_diner(t_diner **diner);
-void 	    sleeping(int philo_id, t_diner **diner);
-void       	taking_fork(int philo_id, t_diner **diner);
-void 	    eating(int philo_id, t_diner **diner);
-void 	    thinking(int philo_id, t_diner **diner);
+void 	    sleeping(t_philos *philo);
+void       	taking_fork(t_philos *philo);
+void 	    eating(t_philos *philo);
+void 	    thinking(t_philos *philo);
 long int    get_time_stamp(void);
 
 #endif
