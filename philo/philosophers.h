@@ -10,6 +10,14 @@
 # define FALSE 0
 #endif
 
+#ifndef IN_USE
+# define IN_USE 1
+#endif
+
+#ifndef NOT_IN_USE
+# define NOT_IN_USE 0
+#endif
+
 #ifndef EXPECTED_ARGS
 # define EXPECTED_ARGS "expected: ./philo number_of_philosophers time_to_die \
 time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n"
@@ -51,6 +59,12 @@ typedef struct s_data
     int             nb_meals_todo;
 }    t_data;
 
+typedef struct s_alive
+{
+    pthread_mutex_t alive_mutex;
+    short int   alive;
+}   t_alive;
+
 typedef struct s_fork
 {
     pthread_mutex_t fork_mutex;
@@ -66,10 +80,10 @@ typedef struct s_philos
     long int        time_since_beggin_last_meal;
     int             nb_meals_done;
     long int		init_thread_time;
-    long int        init_diner_time;
-    short int       philo_alive;
+    long int        start_time;
+    t_alive         *philo_alive;
     struct s_data   *data;
-}    t_philos;
+}   t_philos;
 
 typedef struct s_diner
 {
@@ -77,13 +91,12 @@ typedef struct s_diner
     struct s_philos     **philos;
     struct s_data       *data;
     struct s_fork       *fork;
-    long int            time;
+    long int            start_time;
 }   t_diner;
 
 typedef struct s_supervisor
 {
     short int       alive;
-	pthread_mutex_t supervisor_mutex;
     pthread_t       supervisor_pthread;
     t_diner         *dining_info;
 }  t_supervisor;
