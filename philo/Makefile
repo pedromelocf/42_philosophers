@@ -11,8 +11,7 @@ PHILO_SRCS = dining.c \
 	philos.c \
 	routines.c
 
-#FLAGS -fsanitize=thread
-FLAGS = -Wall -Werror -Wextra -pthread
+FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
 CC = gcc
 
 #MESSAGES

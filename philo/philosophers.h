@@ -50,15 +50,6 @@ time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n"
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct s_data
-{
-    short int		nb_philos;
-    int             time_to_die;
-    int             time_to_eat;
-    int             time_to_sleep;
-    int             nb_meals_todo;
-}    t_data;
-
 typedef struct s_alive
 {
     pthread_mutex_t alive_mutex;
@@ -68,19 +59,34 @@ typedef struct s_alive
 typedef struct s_fork
 {
     pthread_mutex_t fork_mutex;
+	short int	state;
 }   t_fork;
+
+typedef struct s_last_meal
+{
+	pthread_mutex_t last_meal_mutex;
+	long int		time_since_last_meal;
+}	t_last_meal;
+
+typedef struct s_data
+{
+	short int		nb_philos;
+	int             time_to_die;
+	int             time_to_eat;
+	int             time_to_sleep;
+	int             nb_meals_todo;
+}    t_data;
 
 typedef struct s_philos
 {
     t_fork          *left_fork;
     t_fork          *right_fork;
+	t_last_meal     *last_meal;
     pthread_t       philo_pthread;
-    pthread_mutex_t philo_mutex;
     short int       philo_id;
-    long int        time_since_beggin_last_meal;
     int             nb_meals_done;
-    long int		init_thread_time;
     long int        start_time;
+	short int		satisfied;
     t_alive         *philo_alive;
     struct s_data   *data;
 }   t_philos;

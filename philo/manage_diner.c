@@ -24,19 +24,29 @@ void    init_diner(t_diner **diner, int argc, char **argv)
     while (i < (*diner)->data->nb_philos)
     {
         (*diner)->philos[i] = calloc(1, sizeof(t_philos));
+		(*diner)->philos[i]->last_meal = calloc(1, sizeof(t_last_meal));
         (*diner)->philos[i]->philo_alive = calloc(1, sizeof(t_alive));
-        pthread_mutex_init(&(*diner)->philos[i]->philo_mutex, NULL);
-        (*diner)->philos[i]->left_fork = &(*diner)->fork[i];
-        (*diner)->philos[i]->right_fork = &(*diner)->fork[i + 1 % (*diner)->data->nb_philos];
         (*diner)->philos[i]->philo_id = i + 1;
-        (*diner)->philos[i]->time_since_beggin_last_meal = (*diner)->start_time;
-        (*diner)->philos[i]->nb_meals_done = 0;
-        (*diner)->philos[i]->init_thread_time  = 0;
+        (*diner)->philos[i]->last_meal->time_since_last_meal = (*diner)->start_time;
+		pthread_mutex_init(&(*diner)->philos[i]->last_meal->last_meal_mutex, NULL);
+		(*diner)->philos[i]->nb_meals_done = 0;
         (*diner)->philos[i]->start_time = (*diner)->start_time;
         pthread_mutex_init(&(*diner)->philos[i]->philo_alive->alive_mutex, NULL);
         (*diner)->philos[i]->philo_alive->alive = TRUE;
+		(*diner)->philos[i]->satisfied = FALSE;
         (*diner)->philos[i]->data = (*diner)->data;
         pthread_mutex_init(&(*diner)->fork[i].fork_mutex, NULL);
+		(*diner)->fork[i].state = NOT_IN_USE;
+		if (i % 2  == 0)
+		{
+			(*diner)->philos[i]->left_fork = &(*diner)->fork[i];
+			(*diner)->philos[i]->right_fork = &(*diner)->fork[i + 1];
+		}
+		else
+		{
+			(*diner)->philos[i]->left_fork = &(*diner)->fork[i];
+			(*diner)->philos[i]->right_fork = &(*diner)->fork[i - 1];
+		}
         i++;
     }
 }
@@ -52,10 +62,10 @@ void clean_diner(t_diner **diner)
         free((*diner)->supervisor);
     while (i < nb_philos)
     {
-        pthread_mutex_destroy(&(*diner)->philos[i]->philo_mutex);
         pthread_mutex_destroy(&(*diner)->fork[i].fork_mutex);
         pthread_mutex_destroy(&(*diner)->philos[i]->philo_alive->alive_mutex);
-        i++;
+		pthread_mutex_destroy(&(*diner)->philos[i]->last_meal->last_meal_mutex);
+		i++;
     }
     if ((*diner)->philos)
         free((*diner)->philos);
