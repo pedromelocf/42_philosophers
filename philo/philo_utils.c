@@ -41,9 +41,9 @@ long int get_time_stamp(void)
     return(time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
-void ft_usleep(unsigned long time, t_philos *philo)
+void ft_usleep(int time, t_philos *philo)
 {
-    unsigned long start;
+    long int           start;
     int           divider;
 
     if (time > 10000)
@@ -57,8 +57,13 @@ void ft_usleep(unsigned long time, t_philos *philo)
     start = get_time_stamp();
     while (get_time_stamp() - start < time)
     {
-        if(philo->philo_alive == FALSE)
+        pthread_mutex_lock(&philo->philo_alive->mutex);
+        if(philo->philo_alive->alive == FALSE)
+        {
+            pthread_mutex_unlock(&philo->philo_alive->mutex);
             break;
+        }
+        pthread_mutex_unlock(&philo->philo_alive->mutex);
         usleep(time / divider * 1000);
     }
 }

@@ -9,10 +9,10 @@ void	*philos_routine(void *arg)
     philos = (t_philos *)arg;
     while (stop_diner(philos) != 1)
     {
-
+        taking_fork(philos);
+        eating(philos);
         usleep(1000);
     }
-
     return(NULL);
 }
 
@@ -26,7 +26,7 @@ void	*supervisor_routine(void *arg)
     while (i < (*diner)->data->nb_philos)
     {
         pthread_mutex_lock(&(*diner)->philos[i].last_meal->mutex);
-        if (get_time_stamp() - (*diner)->philos[i].last_meal->state < (*diner)->data->time_to_die)
+        if (get_time_stamp() - (*diner)->philos[i].last_meal->state > (*diner)->data->time_to_die)
         {
             pthread_mutex_lock(&(*diner)->supervisor->mutex);
             (*diner)->supervisor->alive = FALSE;
@@ -36,6 +36,19 @@ void	*supervisor_routine(void *arg)
             break;
         }
         pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);
+        if ((*diner)->data->nb_meals_todo != -1)
+        {
+            pthread_mutex_lock(&(*diner)->philos[i].nb_meals_done->mutex);
+            if ((*diner)->philos[i].nb_meals_done->state >= (*diner)->data->nb_meals_todo)
+            {
+                pthread_mutex_lock(&(*diner)->supervisor->mutex);
+                (*diner)->supervisor->alive = FALSE;
+                pthread_mutex_unlock(&(*diner)->supervisor->mutex);
+                pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
+                break;
+            }
+            pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
+        }
         i++;
         if (i == (*diner)->data->nb_philos)
             i = 0;

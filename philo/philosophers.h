@@ -78,11 +78,11 @@ typedef struct s_philos
     t_mutex         *left_fork;
     t_mutex         *right_fork;
 	t_mutex			*last_meal;
+	t_mutex          *nb_meals_done;
 	struct s_supervisor  *philo_alive;
 	struct s_data   *data;
 	struct s_mutex	*print;
     short int       philo_id;
-    int             nb_meals_done;
     long int        start_time;
 	short int		satisfied;
 }   t_philos;
@@ -110,7 +110,7 @@ void       	taking_fork(t_philos *philo);
 void 	    eating(t_philos *philo);
 void 	    thinking(t_philos *philo);
 long int    get_time_stamp(void);
-void		ft_usleep(unsigned long time, t_philos *philos);
+void ft_usleep(int time, t_philos *philo);
 void    safe_print(char *message, t_mutex *print);
 
 #endif

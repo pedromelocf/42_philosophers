@@ -27,6 +27,7 @@ void    init_diner(t_diner **diner, int argc, char **argv)
 	(*diner)->philos = init_philos(*diner);
 	if ((*diner)->philos == NULL)
 		handle_exit("Philosophers initialization failed\n", 1, 1, diner);
+	(*diner)->start_time = get_time_stamp();
 }
 
 static t_mutex *init_forks(t_diner *diner)
@@ -58,12 +59,14 @@ static t_philos *init_philos(t_diner *diner)
 	while (i < diner->data->nb_philos)
 	{
 		philos[i].last_meal = calloc(1, sizeof(t_mutex));
-		philos[i].last_meal->state = diner->start_time;
+		philos[i].last_meal->state = get_time_stamp();
 		pthread_mutex_init(&philos[i].last_meal->mutex, NULL);
 		philos[i].philo_alive = diner->supervisor;
 		philos[i].philo_id = i + 1;
-		philos[i].nb_meals_done = 0;
-		philos[i].start_time = diner->start_time;
+		philos[i].nb_meals_done = calloc(1, sizeof(t_mutex));
+		philos[i].nb_meals_done->state = 0;
+		pthread_mutex_init(&philos[i].nb_meals_done->mutex, NULL);
+		philos[i].start_time = get_time_stamp();
 		philos[i].satisfied = FALSE;
 		philos[i].data = diner->data;
 		philos[i].print = diner->print;
