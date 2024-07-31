@@ -53,31 +53,9 @@ long int	get_time_stamp(void)
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
-void	ft_usleep(int time, t_philos *philo)
+void	ft_usleep(int time)
 {
-	long int	start;
-	int			divider;
-
-	if (time > 10000)
-		divider = 100;
-	else if (time > 1000)
-		divider = 10;
-	else if (time > 500)
-		divider = 4;
-	else
-		divider = 1;
-	start = get_time_stamp();
-	while (get_time_stamp() - start < time)
-	{
-		pthread_mutex_lock(&philo->philo_alive->mutex);
-		if (philo->philo_alive->alive == FALSE)
-		{
-			pthread_mutex_unlock(&philo->philo_alive->mutex);
-			break ;
-		}
-		pthread_mutex_unlock(&philo->philo_alive->mutex);
-		usleep(time / divider * 1000);
-	}
+	usleep(time * 1000);
 }
 
 void	safe_print(char *message, t_mutex *print)

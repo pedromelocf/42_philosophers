@@ -92,7 +92,7 @@ void					taking_fork(t_philos *philo);
 void					eating(t_philos *philo);
 void					thinking(t_philos *philo);
 long int				get_time_stamp(void);
-void					ft_usleep(int time, t_philos *philo);
+void					ft_usleep(int time);
 void					safe_print(char *message, t_mutex *print);
 
 #endif

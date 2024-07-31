@@ -67,7 +67,7 @@ void	*supervisor_routine(void *arg)
 		i++;
 		if (i == (*diner)->data->nb_philos)
 			i = 0;
-		usleep(1000);
+		usleep(10);
 	}
 	return (NULL);
 }
