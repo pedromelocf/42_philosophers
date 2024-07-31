@@ -25,7 +25,6 @@ void	*philos_routine(void *arg)
 		eating(philos);
 		sleeping(philos);
 		thinking(philos);
-		usleep(1000);
 	}
 	return (NULL);
 }

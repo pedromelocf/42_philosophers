@@ -31,12 +31,22 @@ void	eating(t_philos *philos)
 
 void	sleeping(t_philos *philos)
 {
-	printf(SLEEPING, get_time_stamp() - philos->start_time, philos->philo_id);
-	ft_usleep(philos->data->time_to_sleep, philos);
+	pthread_mutex_lock(&philos->philo_alive->mutex);
+	if (philos->philo_alive->alive != FALSE)
+	{
+		printf(SLEEPING, get_time_stamp() - philos->start_time, philos->philo_id);
+		pthread_mutex_unlock(&philos->philo_alive->mutex);
+		ft_usleep(philos->data->time_to_sleep, philos);
+	}
+	else
+		pthread_mutex_unlock(&philos->philo_alive->mutex);
 }
 
 void	thinking(t_philos *philos)
 {
-	printf(THINKING, get_time_stamp() - philos->start_time, philos->philo_id);
+	pthread_mutex_lock(&philos->philo_alive->mutex);
+	if (philos->philo_alive->alive != FALSE)
+		printf(THINKING, get_time_stamp() - philos->start_time, philos->philo_id);
+	pthread_mutex_unlock(&philos->philo_alive->mutex);
 	usleep(1000);
 }
