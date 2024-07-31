@@ -25,9 +25,11 @@ int	ft_atoi(const char *nptr)
     return (sign * c);
 }
 
-void handle_exit(char *str, int status)
+void handle_exit(char *str, int status, int clean, t_diner **diner)
 {
     printf("%s", str);
+    if (clean == 1)
+        clean_diner(diner);
     exit(status);
 }
 
@@ -37,4 +39,33 @@ long int get_time_stamp(void)
 
     gettimeofday(&time, NULL);
     return(time.tv_sec * 1000 + time.tv_usec / 1000);
+}
+
+void ft_usleep(unsigned long time, t_philos *philo)
+{
+    unsigned long start;
+    int           divider;
+
+    if (time > 10000)
+        divider = 100;
+    else if (time > 1000)
+        divider = 10;
+    else if (time > 500)
+        divider = 4;
+    else
+        divider = 1;
+    start = get_time_stamp();
+    while (get_time_stamp() - start < time)
+    {
+        if(philo->philo_alive == FALSE)
+            break;
+        usleep(time / divider * 1000);
+    }
+}
+
+void    safe_print(char *message, t_mutex *print)
+{
+    pthread_mutex_lock(&print->mutex);
+    printf("%s", message);
+    pthread_mutex_unlock(&print->mutex);
 }

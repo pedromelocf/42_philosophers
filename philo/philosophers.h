@@ -50,23 +50,18 @@ time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n"
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct s_alive
+typedef struct s_mutex
 {
-    pthread_mutex_t alive_mutex;
-    short int   alive;
-}   t_alive;
+    pthread_mutex_t mutex;
+	long int		state;
+}   t_mutex;
 
-typedef struct s_fork
+typedef struct s_supervisor
 {
-    pthread_mutex_t fork_mutex;
-	short int	state;
-}   t_fork;
-
-typedef struct s_last_meal
-{
-	pthread_mutex_t last_meal_mutex;
-	long int		time_since_last_meal;
-}	t_last_meal;
+	pthread_mutex_t mutex;
+	short			alive;
+	pthread_t		thread_supervisor;
+}   t_supervisor;
 
 typedef struct s_data
 {
@@ -79,37 +74,33 @@ typedef struct s_data
 
 typedef struct s_philos
 {
-    t_fork          *left_fork;
-    t_fork          *right_fork;
-	t_last_meal     *last_meal;
-    pthread_t       philo_pthread;
+	pthread_t       philo_pthread;
+    t_mutex         *left_fork;
+    t_mutex         *right_fork;
+	t_mutex			*last_meal;
+	struct s_supervisor  *philo_alive;
+	struct s_data   *data;
+	struct s_mutex	*print;
     short int       philo_id;
     int             nb_meals_done;
     long int        start_time;
 	short int		satisfied;
-    t_alive         *philo_alive;
-    struct s_data   *data;
 }   t_philos;
 
 typedef struct s_diner
 {
-    struct s_supervisor *supervisor;
-    struct s_philos     **philos;
-    struct s_data       *data;
-    struct s_fork       *fork;
-    long int            start_time;
+    struct s_supervisor	*supervisor;
+    struct s_philos    *philos;
+    struct s_data      *data;
+    struct s_mutex     *fork;
+	struct s_mutex		*print;
+    long int           start_time;
 }   t_diner;
 
-typedef struct s_supervisor
-{
-    short int       alive;
-    pthread_t       supervisor_pthread;
-    t_diner         *dining_info;
-}  t_supervisor;
 
 void        init_diner(t_diner **diner, int argc, char **argv);
 int         ft_atoi(const char *nptr);
-void 	    handle_exit(char *str, int status);
+void 	    handle_exit(char *str, int status, int clean, t_diner **diner);
 void        dining(t_diner **diner);
 void	    *philos_routine(void *arg);
 void	    *supervisor_routine(void *arg);
@@ -119,5 +110,7 @@ void       	taking_fork(t_philos *philo);
 void 	    eating(t_philos *philo);
 void 	    thinking(t_philos *philo);
 long int    get_time_stamp(void);
+void		ft_usleep(unsigned long time, t_philos *philos);
+void    safe_print(char *message, t_mutex *print);
 
 #endif
