@@ -70,17 +70,16 @@ static t_philos *init_philos(t_diner *diner)
 		philos[i].satisfied = FALSE;
 		philos[i].data = diner->data;
 		philos[i].print = diner->print;
-		if (i % 2  == 0)
+		if (i == 0)
 		{
 			philos[i].left_fork = &diner->fork[i];
-			philos[i].right_fork = &diner->fork[i + 1];
+			philos[i].right_fork = &diner->fork[philos->data->nb_philos - 1];
 		}
 		else
 		{
 			philos[i].left_fork = &diner->fork[i];
 			philos[i].right_fork = &diner->fork[i - 1];
 		}
-		// set_forks//TODO
 		i++;
 	}
 	return (philos);

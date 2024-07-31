@@ -11,6 +11,8 @@ void	*philos_routine(void *arg)
     {
         taking_fork(philos);
         eating(philos);
+        // sleeping(philos);
+        // thinking(philos);
         usleep(1000);
     }
     return(NULL);
