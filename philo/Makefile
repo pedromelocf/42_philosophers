@@ -12,7 +12,7 @@ PHILO_SRCS = dining.c \
 	routines.c
 
 #flags  -pthread -fsanitize=thread
-FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
+FLAGS = -Wall -Werror -Wextra
 CC = gcc
 
 #MESSAGES

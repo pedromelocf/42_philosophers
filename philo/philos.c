@@ -27,5 +27,5 @@ void sleeping(t_philos *philos)
 void thinking(t_philos *philos)
 {
     printf(THINKING, get_time_stamp() - philos->start_time, philos->philo_id);
-    usleep(1);
+    usleep(1000);
 }

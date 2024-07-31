@@ -89,7 +89,7 @@ static t_data *init_data(int argc, char **argv)
 {
 	t_data *data;
 
-	data = calloc(0, sizeof(t_data));
+	data = calloc(1, sizeof(t_data));
 	if (data == NULL)
 		return (NULL);
 	data->nb_philos = ft_atoi(argv[1]);
@@ -111,19 +111,31 @@ void clean_diner(t_diner **diner)
 	i = 0;
 	if ((*diner)->data)
         free((*diner)->data);
-    if ((*diner)->supervisor)
-        free((*diner)->supervisor);
+    if ((*diner)->supervisor){
+    	pthread_mutex_destroy(&(*diner)->supervisor->mutex);
+	    free((*diner)->supervisor);
+    }
+	if ((*diner)->print)
+	{
+		pthread_mutex_destroy(&(*diner)->print->mutex);
+		free((*diner)->print);
+	}
     while (i < nb_philos)
     {
-        pthread_mutex_destroy(&(*diner)->fork[i].mutex);
-        pthread_mutex_destroy(&(*diner)->philos[i].philo_alive->mutex);
-		pthread_mutex_destroy(&(*diner)->philos[i].last_meal->mutex);
+    	pthread_mutex_destroy(&(*diner)->fork[i].mutex);
+    	pthread_mutex_destroy(&(*diner)->philos[i].last_meal->mutex);
+    	if((*diner)->philos[i].last_meal)
+    		free((*diner)->philos[i].last_meal);
+    	if((*diner)->philos[i].nb_meals_done)
+    	{
+    		free((*diner)->philos[i].nb_meals_done);
+    	}
 		i++;
     }
-    if ((*diner)->philos)
+    if((*diner)->philos)
         free((*diner)->philos);
-    if ((*diner)->fork)
-        free((*diner)->fork);
+    if((*diner)->fork)
+    	free((*diner)->fork);
     if(*diner)
         free(*diner);
 }
