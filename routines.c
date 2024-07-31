@@ -25,6 +25,7 @@ void	*philos_routine(void *arg)
 		eating(philos);
 		sleeping(philos);
 		thinking(philos);
+		usleep(10);
 	}
 	return (NULL);
 }
@@ -42,12 +43,12 @@ void	*supervisor_routine(void *arg)
 		if (get_time_stamp()
 			- (*diner)->philos[i].last_meal->state > (*diner)->data->time_to_die)
 		{
+			pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);
 			pthread_mutex_lock(&(*diner)->supervisor->mutex);
 			(*diner)->supervisor->alive = FALSE;
+			pthread_mutex_unlock(&(*diner)->supervisor->mutex);
 			printf(DIED, get_time_stamp() - (*diner)->start_time,
 					(*diner)->philos[i].philo_id);
-			pthread_mutex_unlock(&(*diner)->supervisor->mutex);
-			pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);
 			break ;
 		}
 		pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);
@@ -56,10 +57,10 @@ void	*supervisor_routine(void *arg)
 			pthread_mutex_lock(&(*diner)->philos[i].nb_meals_done->mutex);
 			if ((*diner)->philos[i].nb_meals_done->state >= (*diner)->data->nb_meals_todo)
 			{
+				pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
 				pthread_mutex_lock(&(*diner)->supervisor->mutex);
 				(*diner)->supervisor->alive = FALSE;
 				pthread_mutex_unlock(&(*diner)->supervisor->mutex);
-				pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
 				break ;
 			}
 			pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
