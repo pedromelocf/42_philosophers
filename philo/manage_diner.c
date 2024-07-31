@@ -1,27 +1,39 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   manage_diner.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pmelo-ca <pmelo-ca@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/07/31 12:43:27 by pmelo-ca          #+#    #+#             */
+/*   Updated: 2024/07/31 12:44:06 by pmelo-ca         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philosophers.h"
 
-static t_data *init_data(int argc, char **argv);
-static t_philos *init_philos(t_diner *diner);
-static t_mutex *init_forks(t_diner *diner);
+static t_data	*init_data(int argc, char **argv);
+static t_philos	*init_philos(t_diner *diner);
+static t_mutex	*init_forks(t_diner *diner);
 
-void    init_diner(t_diner **diner, int argc, char **argv)
+void	init_diner(t_diner **diner, int argc, char **argv)
 {
-    if(argc != 5 && argc != 6)
-        handle_exit(EXPECTED_ARGS, 1, 0, NULL);
-    *diner = calloc(1, sizeof(t_diner));
+	if (argc != 5 && argc != 6)
+		handle_exit(EXPECTED_ARGS, 1, 0, NULL);
+	*diner = calloc(1, sizeof(t_diner));
 	if (*diner == NULL)
 		handle_exit("Allocation failed\n", 1, 1, diner);
-    (*diner)->data = init_data(argc, argv);
-	if((*diner)->data == NULL)
+	(*diner)->data = init_data(argc, argv);
+	if ((*diner)->data == NULL)
 		handle_exit("Data initialization failed\n", 1, 1, diner);
-    (*diner)->supervisor = calloc(1, sizeof(t_supervisor));
-    (*diner)->supervisor->alive = TRUE;
-    pthread_mutex_init(&(*diner)->supervisor->mutex, NULL);
+	(*diner)->supervisor = calloc(1, sizeof(t_supervisor));
+	(*diner)->supervisor->alive = TRUE;
+	pthread_mutex_init(&(*diner)->supervisor->mutex, NULL);
 	(*diner)->print = calloc(1, sizeof(t_mutex));
 	if ((*diner)->print == NULL)
 		handle_exit("Print initialization failed\n", 1, 1, diner);
 	pthread_mutex_init(&(*diner)->print->mutex, NULL);
-    (*diner)->fork = init_forks(*diner);
+	(*diner)->fork = init_forks(*diner);
 	if ((*diner)->fork == NULL)
 		handle_exit("Forks initialization failed\n", 1, 1, diner);
 	(*diner)->philos = init_philos(*diner);
@@ -30,11 +42,12 @@ void    init_diner(t_diner **diner, int argc, char **argv)
 	(*diner)->start_time = get_time_stamp();
 }
 
-static t_mutex *init_forks(t_diner *diner)
+static t_mutex	*init_forks(t_diner *diner)
 {
-	t_mutex *forks;
-	int i = 0;
+	t_mutex	*forks;
+	int		i;
 
+	i = 0;
 	forks = calloc(1, sizeof(t_mutex) * diner->data->nb_philos);
 	if (forks == NULL)
 		return (NULL);
@@ -47,10 +60,10 @@ static t_mutex *init_forks(t_diner *diner)
 	return (forks);
 }
 
-static t_philos *init_philos(t_diner *diner)
+static t_philos	*init_philos(t_diner *diner)
 {
-	t_philos *philos;
-	int		 i;
+	t_philos	*philos;
+	int			i;
 
 	i = 0;
 	philos = calloc(1, sizeof(t_philos) * diner->data->nb_philos);
@@ -85,9 +98,9 @@ static t_philos *init_philos(t_diner *diner)
 	return (philos);
 }
 
-static t_data *init_data(int argc, char **argv)
+static t_data	*init_data(int argc, char **argv)
 {
-	t_data *data;
+	t_data	*data;
 
 	data = calloc(1, sizeof(t_data));
 	if (data == NULL)
@@ -102,40 +115,41 @@ static t_data *init_data(int argc, char **argv)
 	return (data);
 }
 
-void clean_diner(t_diner **diner)
+void	clean_diner(t_diner **diner)
 {
-    short int nb_philos;
-    short int i;
+	short int	nb_philos;
+	short int	i;
 
 	nb_philos = (*diner)->data->nb_philos;
 	i = 0;
 	if ((*diner)->data)
-        free((*diner)->data);
-    if ((*diner)->supervisor){
-    	pthread_mutex_destroy(&(*diner)->supervisor->mutex);
-	    free((*diner)->supervisor);
-    }
+		free((*diner)->data);
+	if ((*diner)->supervisor)
+	{
+		pthread_mutex_destroy(&(*diner)->supervisor->mutex);
+		free((*diner)->supervisor);
+	}
 	if ((*diner)->print)
 	{
 		pthread_mutex_destroy(&(*diner)->print->mutex);
 		free((*diner)->print);
 	}
-    while (i < nb_philos)
-    {
-    	pthread_mutex_destroy(&(*diner)->fork[i].mutex);
-    	pthread_mutex_destroy(&(*diner)->philos[i].last_meal->mutex);
-    	if((*diner)->philos[i].last_meal)
-    		free((*diner)->philos[i].last_meal);
-    	if((*diner)->philos[i].nb_meals_done)
-    	{
-    		free((*diner)->philos[i].nb_meals_done);
-    	}
+	while (i < nb_philos)
+	{
+		pthread_mutex_destroy(&(*diner)->fork[i].mutex);
+		pthread_mutex_destroy(&(*diner)->philos[i].last_meal->mutex);
+		if ((*diner)->philos[i].last_meal)
+			free((*diner)->philos[i].last_meal);
+		if ((*diner)->philos[i].nb_meals_done)
+		{
+			free((*diner)->philos[i].nb_meals_done);
+		}
 		i++;
-    }
-    if((*diner)->philos)
-        free((*diner)->philos);
-    if((*diner)->fork)
-    	free((*diner)->fork);
-    if(*diner)
-        free(*diner);
+	}
+	if ((*diner)->philos)
+		free((*diner)->philos);
+	if ((*diner)->fork)
+		free((*diner)->fork);
+	if (*diner)
+		free(*diner);
 }
