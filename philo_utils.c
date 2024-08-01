@@ -21,19 +21,13 @@ int	ft_atoi(const char *nptr)
 	c = 0;
 	i = 0;
 	sign = 1;
-	while (nptr[i] == ' ' || (nptr[i] >= '\t' && nptr[i] <= '\r'))
-		i++;
-	if (nptr[i] == '-' || nptr[i] == '+')
-	{
-		if (nptr[i] == '-')
-			sign *= -1;
-		i++;
-	}
 	while (nptr[i] >= '0' && nptr[i] <= '9')
 	{
 		c = c * 10 + nptr[i] - '0';
 		i++;
 	}
+	if (nptr[i] != '\0')
+		return (-2);
 	return (sign * c);
 }
 
@@ -42,7 +36,20 @@ void	handle_exit(char *str, int status, int clean, t_diner **diner)
 	printf("%s", str);
 	if (clean == 1)
 		clean_diner(diner);
+	if (clean == 2)
+	{
+		free((*diner)->data);
+		free(*diner);
+	}
 	exit(status);
+}
+
+void	input_validations(t_diner **diner)
+{
+	if ((*diner)->data->nb_philos == -2 || (*diner)->data->time_to_die == -2 ||
+			(*diner)->data->time_to_eat== -2 || (*diner)->data->time_to_sleep == -2 ||
+				(*diner)->data->nb_meals_todo == -2)
+		handle_exit(WRONG_ARGS, 1, 2, diner);
 }
 
 long int	get_time_stamp(void)

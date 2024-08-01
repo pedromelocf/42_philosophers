@@ -26,6 +26,7 @@ void	init_diner(t_diner **diner, int argc, char **argv)
 	(*diner)->data = init_data(argc, argv);
 	if ((*diner)->data == NULL)
 		handle_exit("Data initialization failed\n", 1, 1, diner);
+	input_validations(diner);
 	(*diner)->supervisor = calloc(1, sizeof(t_supervisor));
 	(*diner)->supervisor->alive = TRUE;
 	pthread_mutex_init(&(*diner)->supervisor->mutex, NULL);
