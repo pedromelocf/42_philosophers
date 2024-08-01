@@ -94,5 +94,6 @@ void					thinking(t_philos *philo);
 long int				get_time_stamp(void);
 void					ft_usleep(int time);
 void					safe_print(char *message, long int time, short int id, t_mutex *print);
+int						stop_diner(t_philos *philos);
 
 #endif

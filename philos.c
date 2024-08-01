@@ -14,36 +14,38 @@
 
 void	taking_fork(t_philos *philos)
 {
-	if (philos->data->nb_philos == 1)
+	if (stop_diner(philos) == FALSE)
 	{
-		pthread_mutex_lock(&philos->right_fork->mutex);
-		philos->right_fork->state = IN_USE;
-		safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
-		ft_usleep(philos->data->time_to_die + 1);
+		if (philos->data->nb_philos == 1)
+		{
+			pthread_mutex_lock(&philos->right_fork->mutex);
+			philos->right_fork->state = IN_USE;
+			safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
+			ft_usleep(philos->data->time_to_die + 1);
+		}
+		else if (philos->philo_id % 2 == 0)
+		{
+			ft_usleep(2);
+			pthread_mutex_lock(&philos->right_fork->mutex);
+			philos->right_fork->state = IN_USE;
+			pthread_mutex_lock(&philos->left_fork->mutex);
+			philos->left_fork->state = IN_USE;
+		}
+		else if (philos->philo_id % 2 == 1)
+		{
+			pthread_mutex_lock(&philos->left_fork->mutex);
+			philos->left_fork->state = IN_USE;
+			pthread_mutex_lock(&philos->right_fork->mutex);
+			philos->right_fork->state = IN_USE;
+		}
+		if(philos->data->nb_philos != 1 && (stop_diner(philos) == FALSE))
+			safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 	}
-	else if (philos->philo_id % 2 == 0)
-	{
-		ft_usleep(2);
-		pthread_mutex_lock(&philos->right_fork->mutex);
-		philos->right_fork->state = IN_USE;
-		pthread_mutex_lock(&philos->left_fork->mutex);
-		philos->left_fork->state = IN_USE;
-	}
-	else if (philos->philo_id % 2 == 1)
-	{
-		pthread_mutex_lock(&philos->left_fork->mutex);
-		philos->left_fork->state = IN_USE;
-		pthread_mutex_lock(&philos->right_fork->mutex);
-		philos->right_fork->state = IN_USE;
-	}
-	if(philos->data->nb_philos != 1)
-		safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 }
 
 void	eating(t_philos *philos)
 {
-	pthread_mutex_lock(&philos->philo_alive->mutex);
-	if (philos->philo_alive->alive == TRUE)
+	if (stop_diner(philos) == FALSE)
 	{
 		pthread_mutex_lock(&philos->last_meal->mutex);
 		philos->last_meal->state = get_time_stamp();
@@ -64,26 +66,22 @@ void	eating(t_philos *philos)
 		if (philos->data->nb_philos != 1)
 			pthread_mutex_unlock(&philos->right_fork->mutex);
 	}
-	pthread_mutex_unlock(&philos->philo_alive->mutex);
 }
 
 void	sleeping(t_philos *philos)
 {
-	pthread_mutex_lock(&philos->philo_alive->mutex);
-	if (philos->philo_alive->alive == TRUE)
+	if (stop_diner(philos) == FALSE)
 	{
 		safe_print(SLEEPING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
-		pthread_mutex_unlock(&philos->philo_alive->mutex);
 		ft_usleep(philos->data->time_to_sleep);
 	}
-	else
-		pthread_mutex_unlock(&philos->philo_alive->mutex);
 }
 
 void	thinking(t_philos *philos)
 {
-	pthread_mutex_lock(&philos->philo_alive->mutex);
-	if (philos->philo_alive->alive == TRUE)
+	if (stop_diner(philos) == FALSE)
+	{
 		safe_print(THINKING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
-	pthread_mutex_unlock(&philos->philo_alive->mutex);
+			usleep(10);
+	}
 }

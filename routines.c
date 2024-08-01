@@ -12,14 +12,15 @@
 
 #include "philosophers.h"
 
-static int	stop_diner(t_philos *philos);
-
 void	*philos_routine(void *arg)
 {
 	t_philos	*philos;
 
 	philos = (t_philos *)arg;
-	while (stop_diner(philos) != 1)
+	pthread_mutex_lock(&philos->last_meal->mutex);
+	philos->last_meal->state = get_time_stamp();
+	pthread_mutex_unlock(&philos->last_meal->mutex);
+	while (stop_diner(philos) == FALSE)
 	{
 		taking_fork(philos);
 		eating(philos);
@@ -73,7 +74,7 @@ void	*supervisor_routine(void *arg)
 	return (NULL);
 }
 
-static int	stop_diner(t_philos *philos)
+int	stop_diner(t_philos *philos)
 {
 	int value;
 
