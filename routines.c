@@ -47,8 +47,8 @@ void	*supervisor_routine(void *arg)
 			pthread_mutex_lock(&(*diner)->supervisor->mutex);
 			(*diner)->supervisor->alive = FALSE;
 			pthread_mutex_unlock(&(*diner)->supervisor->mutex);
-			printf(DIED, get_time_stamp() - (*diner)->start_time,
-					(*diner)->philos[i].philo_id);
+			safe_print(DIED, get_time_stamp() - (*diner)->start_time,
+					(*diner)->philos[i].philo_id, (*diner)->print);
 			break ;
 		}
 		pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);

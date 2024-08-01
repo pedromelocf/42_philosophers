@@ -19,11 +19,11 @@
 # define NOT_IN_USE 0
 # define EXPECTED_ARGS "expected: ./philo number_of_philosophers time_to_die \
 time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n"
-# define TAKEN_FORK "%ld %d has taken a fork\n"
-# define EATING "%ld %d is eating\n"
-# define SLEEPING "%ld %d is sleeping\n"
-# define THINKING "%ld %d is thinking\n"
-# define DIED "%ld %d died\n"
+# define TAKEN_FORK " has taken a fork\n"
+# define EATING " is eating\n"
+# define SLEEPING " is sleeping\n"
+# define THINKING " is thinking\n"
+# define DIED " died\n"
 
 # include <pthread.h>
 # include <stdio.h>
@@ -93,6 +93,6 @@ void					eating(t_philos *philo);
 void					thinking(t_philos *philo);
 long int				get_time_stamp(void);
 void					ft_usleep(int time);
-void					safe_print(char *message, t_mutex *print);
+void					safe_print(char *message, long int time, short int id, t_mutex *print);
 
 #endif

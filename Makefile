@@ -9,7 +9,8 @@ PHILO_SRCS = dining.c \
 	manage_diner.c \
 	philo_utils.c \
 	philos.c \
-	routines.c
+	routines.c \
+	safe_print.c
 
 #flags   -fsanitize=thread
 FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread

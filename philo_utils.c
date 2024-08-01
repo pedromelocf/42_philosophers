@@ -57,10 +57,3 @@ void	ft_usleep(int time)
 {
 	usleep(time * 1000);
 }
-
-void	safe_print(char *message, t_mutex *print)
-{
-	pthread_mutex_lock(&print->mutex);
-	printf("%s", message);
-	pthread_mutex_unlock(&print->mutex);
-}

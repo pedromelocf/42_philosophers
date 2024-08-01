@@ -18,7 +18,7 @@ void	taking_fork(t_philos *philos)
 	{
 		pthread_mutex_lock(&philos->right_fork->mutex);
 		philos->right_fork->state = IN_USE;
-		printf(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id);
+		safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 		ft_usleep(philos->data->time_to_die + 1);
 	}
 	else if (philos->philo_id % 2 == 0)
@@ -37,7 +37,7 @@ void	taking_fork(t_philos *philos)
 		philos->right_fork->state = IN_USE;
 	}
 	if(philos->data->nb_philos != 1)
-		printf(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id);
+		safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 }
 
 void	eating(t_philos *philos)
@@ -48,7 +48,7 @@ void	eating(t_philos *philos)
 		pthread_mutex_lock(&philos->last_meal->mutex);
 		philos->last_meal->state = get_time_stamp();
 		pthread_mutex_unlock(&philos->last_meal->mutex);
-		printf(EATING, get_time_stamp() - philos->start_time, philos->philo_id);
+		safe_print(EATING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 		ft_usleep(philos->data->time_to_eat);
 		pthread_mutex_lock(&philos->nb_meals_done->mutex);
 		philos->nb_meals_done->state++;
@@ -72,7 +72,7 @@ void	sleeping(t_philos *philos)
 	pthread_mutex_lock(&philos->philo_alive->mutex);
 	if (philos->philo_alive->alive == TRUE)
 	{
-		printf(SLEEPING, get_time_stamp() - philos->start_time, philos->philo_id);
+		safe_print(SLEEPING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 		pthread_mutex_unlock(&philos->philo_alive->mutex);
 		ft_usleep(philos->data->time_to_sleep);
 	}
@@ -84,6 +84,6 @@ void	thinking(t_philos *philos)
 {
 	pthread_mutex_lock(&philos->philo_alive->mutex);
 	if (philos->philo_alive->alive == TRUE)
-		printf(THINKING, get_time_stamp() - philos->start_time, philos->philo_id);
+		safe_print(THINKING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 	pthread_mutex_unlock(&philos->philo_alive->mutex);
 }
