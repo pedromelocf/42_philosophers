@@ -19,6 +19,7 @@
 # define NOT_IN_USE 0
 # define EXPECTED_ARGS "expected: ./philo number_of_philosophers time_to_die \
 time_to_eat time_to_sleep [number_of_times_each_philosopher_must_eat]\n"
+# define WRONG_ARGS "invalid input: use numbers >= 0\n"
 # define TAKEN_FORK " has taken a fork\n"
 # define EATING " is eating\n"
 # define SLEEPING " is sleeping\n"
@@ -95,5 +96,6 @@ long int				get_time_stamp(void);
 void					ft_usleep(int time);
 void					safe_print(char *message, long int time, short int id, t_mutex *print);
 int						stop_diner(t_philos *philos);
+void					input_validations(t_diner **diner);
 
 #endif

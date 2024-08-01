@@ -38,7 +38,7 @@ void	taking_fork(t_philos *philos)
 			pthread_mutex_lock(&philos->right_fork->mutex);
 			philos->right_fork->state = IN_USE;
 		}
-		if(philos->data->nb_philos != 1 && (stop_diner(philos) == FALSE))
+		if(philos->data->nb_philos != 1 && stop_diner(philos) == FALSE)
 			safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 	}
 }
@@ -82,6 +82,6 @@ void	thinking(t_philos *philos)
 	if (stop_diner(philos) == FALSE)
 	{
 		safe_print(THINKING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
-			usleep(10);
+			usleep(1);
 	}
 }
