@@ -20,7 +20,7 @@ void	*philos_routine(void *arg)
 	pthread_mutex_lock(&philos->last_meal->mutex);
 	philos->last_meal->state = get_time_stamp();
 	pthread_mutex_unlock(&philos->last_meal->mutex);
-	while (stop_diner(philos) == FALSE)
+	while (philo_died(philos) == FALSE && philo_satisfied(philos) == FALSE)
 	{
 		taking_fork(philos);
 		eating(philos);
@@ -35,11 +35,13 @@ void	*supervisor_routine(void *arg)
 {
 	t_diner	**diner;
 	int		i;
+	int		all_satisfied;
 
 	diner = (t_diner **)arg;
 	i = 0;
 	while (i < (*diner)->data->nb_philos)
 	{
+		all_satisfied = TRUE;
 		pthread_mutex_lock(&(*diner)->philos[i].last_meal->mutex);
 		if (get_time_stamp()
 			- (*diner)->philos[i].last_meal->state > (*diner)->data->time_to_die)
@@ -59,29 +61,70 @@ void	*supervisor_routine(void *arg)
 			if ((*diner)->philos[i].nb_meals_done->state >= (*diner)->data->nb_meals_todo)
 			{
 				pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
-				pthread_mutex_lock(&(*diner)->supervisor->mutex);
-				(*diner)->supervisor->alive = FALSE;
-				pthread_mutex_unlock(&(*diner)->supervisor->mutex);
-				break ;
+				pthread_mutex_lock(&(*diner)->philos[i].satisfied->mutex);
+				(*diner)->philos[i].satisfied->state = TRUE;
+				pthread_mutex_unlock(&(*diner)->philos[i].satisfied->mutex);
 			}
-			pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
+			else
+			{
+				pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
+				all_satisfied = FALSE;
+			}
 		}
 		i++;
 		if (i == (*diner)->data->nb_philos)
-			i = 0;
+		{
+			if (all_satisfied == FALSE)
+				i = 0;
+		}
 		usleep(10);
 	}
 	return (NULL);
 }
 
-int	stop_diner(t_philos *philos)
+int	philo_died(t_philos *philos)
 {
 	int value;
 
-	value = 0;
+	value = FALSE;
 	pthread_mutex_lock(&philos->philo_alive->mutex);
 	if (philos->philo_alive->alive == FALSE)
-		value = 1;
+		value = TRUE;
 	pthread_mutex_unlock(&philos->philo_alive->mutex);
 	return (value);
 }
+
+int philo_satisfied(t_philos *philos)
+{
+	int value;
+
+	value = FALSE;
+	pthread_mutex_lock(&philos->satisfied->mutex);
+	if(philos->satisfied->state == TRUE)
+		value = TRUE;
+	pthread_mutex_unlock(&philos->satisfied->mutex);
+	return (value);
+}
+
+// static int check_all_satisfied(t_diner **diner)
+// {
+// 	int value;
+// 	int philo_nb;
+// 	int i;
+//
+// 	i = 1;
+// 	value = TRUE;
+// 	philo_nb = (*diner)->data->nb_philos;
+// 	while (i < philo_nb)
+// 	{
+// 		pthread_mutex_lock(&(*diner)->philos[i].satisfied->mutex);
+// 		if((*diner)->philos[i].satisfied->state == FALSE)
+// 		{
+// 			value = FALSE;
+// 			break;
+// 		}
+// 		pthread_mutex_unlock(&(*diner)->philos[i].satisfied->mutex);
+// 		i++;
+// 	}
+// 	return (value);
+// }

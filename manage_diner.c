@@ -81,7 +81,9 @@ static t_philos	*init_philos(t_diner *diner)
 		philos[i].nb_meals_done->state = 0;
 		pthread_mutex_init(&philos[i].nb_meals_done->mutex, NULL);
 		philos[i].start_time = get_time_stamp();
-		philos[i].satisfied = FALSE;
+		philos[i].satisfied = calloc(1, sizeof(t_mutex));
+		philos[i].satisfied->state = FALSE;
+		pthread_mutex_init(&philos[i].satisfied->mutex, NULL);
 		philos[i].data = diner->data;
 		philos[i].print = diner->print;
 		if (i == 0)
@@ -139,6 +141,7 @@ void	clean_diner(t_diner **diner)
 	{
 		pthread_mutex_destroy(&(*diner)->fork[i].mutex);
 		pthread_mutex_destroy(&(*diner)->philos[i].last_meal->mutex);
+		pthread_mutex_destroy(&(*diner)->philos[i].satisfied->mutex);
 		if ((*diner)->philos[i].last_meal)
 			free((*diner)->philos[i].last_meal);
 		if ((*diner)->philos[i].nb_meals_done)

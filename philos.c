@@ -14,7 +14,7 @@
 
 void	taking_fork(t_philos *philos)
 {
-	if (stop_diner(philos) == FALSE)
+	if (philo_died(philos) == FALSE && philo_satisfied(philos) == FALSE)
 	{
 		if (philos->data->nb_philos == 1)
 		{
@@ -25,7 +25,7 @@ void	taking_fork(t_philos *philos)
 		}
 		else if (philos->philo_id % 2 == 0)
 		{
-			ft_usleep(2);
+			ft_usleep(1);
 			pthread_mutex_lock(&philos->right_fork->mutex);
 			philos->right_fork->state = IN_USE;
 			pthread_mutex_lock(&philos->left_fork->mutex);
@@ -38,14 +38,14 @@ void	taking_fork(t_philos *philos)
 			pthread_mutex_lock(&philos->right_fork->mutex);
 			philos->right_fork->state = IN_USE;
 		}
-		if(philos->data->nb_philos != 1 && stop_diner(philos) == FALSE)
+		if(philos->data->nb_philos != 1 && philo_died(philos) == FALSE)
 			safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 	}
 }
 
 void	eating(t_philos *philos)
 {
-	if (stop_diner(philos) == FALSE)
+	if (philo_died(philos) == FALSE && philo_satisfied(philos) == FALSE)
 	{
 		pthread_mutex_lock(&philos->last_meal->mutex);
 		philos->last_meal->state = get_time_stamp();
@@ -70,7 +70,7 @@ void	eating(t_philos *philos)
 
 void	sleeping(t_philos *philos)
 {
-	if (stop_diner(philos) == FALSE)
+	if (philo_died(philos) == FALSE && philo_satisfied(philos) == FALSE)
 	{
 		safe_print(SLEEPING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 		ft_usleep(philos->data->time_to_sleep);
@@ -79,7 +79,7 @@ void	sleeping(t_philos *philos)
 
 void	thinking(t_philos *philos)
 {
-	if (stop_diner(philos) == FALSE)
+	if (philo_died(philos) == FALSE && philo_satisfied(philos) == FALSE)
 	{
 		safe_print(THINKING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 			usleep(1);
