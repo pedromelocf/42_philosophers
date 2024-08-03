@@ -21,7 +21,7 @@ void	taking_fork(t_philos *philos)
 			pthread_mutex_lock(&philos->right_fork->mutex);
 			philos->right_fork->state = IN_USE;
 			safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
-			ft_usleep(philos->data->time_to_die + 1);
+			ft_usleep(philos->data->time_to_die + 5);
 		}
 		else if (philos->philo_id % 2 == 0)
 		{
@@ -52,13 +52,19 @@ void	eating(t_philos *philos)
 		pthread_mutex_unlock(&philos->last_meal->mutex);
 		safe_print(EATING, get_time_stamp() - philos->start_time, philos->philo_id, philos->print);
 		ft_usleep(philos->data->time_to_eat);
-		pthread_mutex_lock(&philos->nb_meals_done->mutex);
-		philos->nb_meals_done->state++;
-		pthread_mutex_unlock(&philos->nb_meals_done->mutex);
 		philos->left_fork->state = NOT_IN_USE;
 		philos->right_fork->state = NOT_IN_USE;
 		pthread_mutex_unlock(&philos->left_fork->mutex);
 		pthread_mutex_unlock(&philos->right_fork->mutex);
+		pthread_mutex_lock(&philos->nb_meals_done->mutex);
+		philos->nb_meals_done->state++;
+		if (philos->nb_meals_done->state >= philos->data->nb_meals_todo && philos->data->nb_meals_todo !=- 1)
+		{
+			pthread_mutex_lock(&philos->satisfied->mutex);
+			philos->satisfied->state = TRUE;
+			pthread_mutex_unlock(&philos->satisfied->mutex);
+		}
+		pthread_mutex_unlock(&philos->nb_meals_done->mutex);
 	}
 	else
 	{

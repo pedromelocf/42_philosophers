@@ -10,7 +10,7 @@ void	safe_print(char *message, long int time, short int id, t_mutex *print)
     char *str_id;
 
     str_time = lltoa(time);
-    str_id = lltoa((long int)id);
+    str_id = lltoa(id);
     pthread_mutex_lock(&print->mutex);
     write(1, str_time, ilen(time));
     write(1, " ", 1);
