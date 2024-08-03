@@ -2,7 +2,8 @@
 NAME = philo
 PHILO_SRC_PATH = ./
 PHILO_INCLUDES = ./philosophers.h
-PHILO_OBJ = $(addprefix $(PHILO_SRC_PATH), $(PHILO_SRCS:.c=.o))
+PHILO_OBJ_PATH = philos_object
+PHILO_OBJ = $(addprefix $(PHILO_OBJ_PATH)/, $(notdir $(PHILO_SRCS:.c=.o)))
 
 PHILO_SRCS = dining.c \
 	main.c \
@@ -35,11 +36,12 @@ $(NAME): $(PHILO_OBJ)
 	@ echo ' '
 	@ echo ' '
 
-$(PHILO_SRC_PATH)%.o: $(PHILO_SRC_PATH)%.c $(PHILO_INCLUDES)
+$(PHILO_OBJ_PATH)/%.o: $(PHILO_SRC_PATH)/%.c $(PHILO_INCLUDES)
+	@ mkdir -p $(PHILO_OBJ_PATH)
 	@ $(CC) $(FLAGS) -c $< -o $@
 
 clean :
-	@ rm -f $(PHILO_OBJ)
+	@ rm -rf $(PHILO_OBJ_PATH)
 	@ echo ' '
 	@ echo $(MESSAGE4)
 	@ echo ' '
