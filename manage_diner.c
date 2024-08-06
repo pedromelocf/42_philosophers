@@ -101,23 +101,6 @@ static t_philos	*init_philos(t_diner *diner)
 	return (philos);
 }
 
-static t_data	*init_data(int argc, char **argv)
-{
-	t_data	*data;
-
-	data = calloc(1, sizeof(t_data));
-	if (data == NULL)
-		return (NULL);
-	data->nb_philos = ft_atoi(argv[1]);
-	data->time_to_die = ft_atoi(argv[2]);
-	data->time_to_eat = ft_atoi(argv[3]);
-	data->time_to_sleep = ft_atoi(argv[4]);
-	data->nb_meals_todo = -1;
-	if (argc == 6)
-		data->nb_meals_todo = ft_atoi(argv[5]);
-	return (data);
-}
-
 void	clean_diner(t_diner **diner)
 {
 	short int	nb_philos;
@@ -148,6 +131,10 @@ void	clean_diner(t_diner **diner)
 		{
 			free((*diner)->philos[i].nb_meals_done);
 		}
+		if ((*diner)->philos[i].satisfied)
+		{
+			free((*diner)->philos[i].satisfied);
+		}
 		i++;
 	}
 	if ((*diner)->philos)
@@ -156,4 +143,21 @@ void	clean_diner(t_diner **diner)
 		free((*diner)->fork);
 	if (*diner)
 		free(*diner);
+}
+
+static t_data	*init_data(int argc, char **argv)
+{
+	t_data	*data;
+
+	data = calloc(1, sizeof(t_data));
+	if (data == NULL)
+		return (NULL);
+	data->nb_philos = ft_atoi(argv[1]);
+	data->time_to_die = ft_atoi(argv[2]);
+	data->time_to_eat = ft_atoi(argv[3]);
+	data->time_to_sleep = ft_atoi(argv[4]);
+	data->nb_meals_todo = -1;
+	if (argc == 6)
+		data->nb_meals_todo = ft_atoi(argv[5]);
+	return (data);
 }
