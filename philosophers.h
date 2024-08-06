@@ -6,7 +6,7 @@
 /*   By: pmelo-ca <pmelo-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 12:55:56 by pmelo-ca          #+#    #+#             */
-/*   Updated: 2024/07/31 12:59:21 by pmelo-ca         ###   ########.fr       */
+/*   Updated: 2024/08/06 20:26:53 by pmelo-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,9 +94,14 @@ void					eating(t_philos *philo);
 void					thinking(t_philos *philo);
 long int				get_time_stamp(void);
 void					ft_usleep(int time);
-void					safe_print(char *message, long int time, short int id, t_mutex *print);
+void					safe_print(char *message, long int time, short int id,
+							t_mutex *print);
 int						philo_died(t_philos *philos);
 void					input_validations(t_diner **diner);
 int						philo_satisfied(t_philos *philos);
+void					update_loop(t_diner **diner, int all_satisfied, int *i);
+int						supervisor_check_alive(t_diner **diner, int i);
+void					supervisor_check_satisfied(t_diner **diner,
+							int *all_satisfied, int i);
 
 #endif

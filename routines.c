@@ -6,7 +6,7 @@
 /*   By: pmelo-ca <pmelo-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 12:43:51 by pmelo-ca          #+#    #+#             */
-/*   Updated: 2024/08/06 18:16:38 by pmelo-ca         ###   ########.fr       */
+/*   Updated: 2024/08/06 19:27:15 by pmelo-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,34 +42,10 @@ void	*supervisor_routine(void *arg)
 	while (i < (*diner)->data->nb_philos)
 	{
 		all_satisfied = FALSE;
-		pthread_mutex_lock(&(*diner)->philos[i].last_meal->mutex);
-		if (get_time_stamp()
-			- (*diner)->philos[i].last_meal->state > (*diner)->data->time_to_die)
-		{
-			pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);
-			pthread_mutex_lock(&(*diner)->supervisor->mutex);
-			(*diner)->supervisor->alive = FALSE;
-			pthread_mutex_unlock(&(*diner)->supervisor->mutex);
-			safe_print(DIED, get_time_stamp() - (*diner)->start_time,
-				(*diner)->philos[i].philo_id, (*diner)->print);
+		if (supervisor_check_alive(diner, i) == FALSE)
 			break ;
-		}
-		pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);
-		if ((*diner)->data->nb_meals_todo != -1)
-		{
-			pthread_mutex_lock(&(*diner)->philos[i].nb_meals_done->mutex);
-			if ((*diner)->philos[i].nb_meals_done->state >= (*diner)->philos[i].data->nb_meals_todo)
-				all_satisfied = TRUE;
-			else
-				all_satisfied = FALSE;
-			pthread_mutex_unlock(&(*diner)->philos[i].nb_meals_done->mutex);
-		}
-		i++;
-		if (i == (*diner)->data->nb_philos)
-		{
-			if (all_satisfied == FALSE)
-				i = 0;
-		}
+		supervisor_check_satisfied(diner, &all_satisfied, i);
+		update_loop(diner, all_satisfied, &i);
 		usleep(10);
 	}
 	return (NULL);
