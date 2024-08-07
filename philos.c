@@ -29,19 +29,36 @@ void	taking_fork(t_philos *philos)
 			ft_usleep(1);
 			pthread_mutex_lock(&philos->right_fork->mutex);
 			philos->right_fork->state = IN_USE;
+			if (philo_died(philos) == FALSE)
+			{
+				safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
+						   philos->philo_id, philos->print);
+			}
 			pthread_mutex_lock(&philos->left_fork->mutex);
 			philos->left_fork->state = IN_USE;
+			if (philo_died(philos) == FALSE)
+			{
+				safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
+						   philos->philo_id, philos->print);
+			}
 		}
 		else if (philos->philo_id % 2 == 1)
 		{
 			pthread_mutex_lock(&philos->left_fork->mutex);
 			philos->left_fork->state = IN_USE;
+			if (philo_died(philos) == FALSE)
+			{
+				safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
+						   philos->philo_id, philos->print);
+			}
 			pthread_mutex_lock(&philos->right_fork->mutex);
 			philos->right_fork->state = IN_USE;
+			if (philo_died(philos) == FALSE)
+			{
+				safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
+						   philos->philo_id, philos->print);
+			}
 		}
-		if (philos->data->nb_philos != 1 && philo_died(philos) == FALSE)
-			safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
-				philos->philo_id, philos->print);
 	}
 }
 
