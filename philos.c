@@ -6,7 +6,7 @@
 /*   By: pmelo-ca <pmelo-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 12:43:45 by pmelo-ca          #+#    #+#             */
-/*   Updated: 2024/08/06 18:16:29 by pmelo-ca         ###   ########.fr       */
+/*   Updated: 2024/08/09 17:04:25 by pmelo-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	thinking(t_philos *philos)
 static void	update_philo_satisfaction(t_philos *philos)
 {
 	if (philos->nb_meals_done->state >= philos->data->nb_meals_todo
-			&& philos->data->nb_meals_todo != -1)
+		&& philos->data->nb_meals_todo != -1)
 	{
 		pthread_mutex_lock(&philos->satisfied->mutex);
 		philos->satisfied->state = TRUE;

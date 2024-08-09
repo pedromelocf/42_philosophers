@@ -6,7 +6,7 @@
 /*   By: pmelo-ca <pmelo-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 12:55:56 by pmelo-ca          #+#    #+#             */
-/*   Updated: 2024/08/06 20:26:53 by pmelo-ca         ###   ########.fr       */
+/*   Updated: 2024/08/09 17:03:41 by pmelo-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void					update_loop(t_diner **diner, int all_satisfied, int *i);
 int						supervisor_check_alive(t_diner **diner, int i);
 void					supervisor_check_satisfied(t_diner **diner,
 							int *all_satisfied, int i);
-void				    philo_solo(t_philos *philos);
+void					philo_solo(t_philos *philos);
 void					taking_fork_even(t_philos *philos);
 void					taking_fork_odd(t_philos *philos);
 #endif

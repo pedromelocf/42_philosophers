@@ -6,7 +6,7 @@
 /*   By: pmelo-ca <pmelo-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 12:43:38 by pmelo-ca          #+#    #+#             */
-/*   Updated: 2024/08/06 19:21:52 by pmelo-ca         ###   ########.fr       */
+/*   Updated: 2024/08/09 17:03:13 by pmelo-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,9 @@ void	handle_exit(char *str, int status, int clean, t_diner **diner)
 
 void	input_validations(t_diner **diner)
 {
-	if ((*diner)->data->nb_philos == -2
-		|| (*diner)->data->time_to_die == -2
-		|| (*diner)->data->time_to_eat == -2
-		|| (*diner)->data->time_to_sleep == -2
-		|| (*diner)->data->nb_meals_todo == -2)
+	if ((*diner)->data->nb_philos == -2 || (*diner)->data->time_to_die == -2
+		|| (*diner)->data->time_to_eat == -2 || (*diner)->data->time_to_sleep
+		== -2 || (*diner)->data->nb_meals_todo == -2)
 		handle_exit(WRONG_ARGS, 1, 2, diner);
 }
 
@@ -66,5 +64,3 @@ void	ft_usleep(int time)
 {
 	usleep(time * 1000);
 }
-
-
