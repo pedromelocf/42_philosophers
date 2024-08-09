@@ -12,7 +12,8 @@ PHILO_SRCS = dining.c \
 	philos.c \
 	routines.c \
 	routines_utils.c \
-	safe_print.c
+	safe_print.c \
+	taking_forks_aux.c
 
 FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
 CC = gcc

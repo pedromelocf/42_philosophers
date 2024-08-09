@@ -12,53 +12,18 @@
 
 #include "philosophers.h"
 
+static void	update_philo_satisfaction(t_philos *philos);
+
 void	taking_fork(t_philos *philos)
 {
 	if (philo_died(philos) == FALSE && philo_satisfied(philos) == FALSE)
 	{
 		if (philos->data->nb_philos == 1)
-		{
-			pthread_mutex_lock(&philos->right_fork->mutex);
-			philos->right_fork->state = IN_USE;
-			safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
-				philos->philo_id, philos->print);
-			ft_usleep(philos->data->time_to_die + 5);
-		}
+			philo_solo(philos);
 		else if (philos->philo_id % 2 == 0)
-		{
-			ft_usleep(1);
-			pthread_mutex_lock(&philos->right_fork->mutex);
-			philos->right_fork->state = IN_USE;
-			if (philo_died(philos) == FALSE)
-			{
-				safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
-						   philos->philo_id, philos->print);
-			}
-			pthread_mutex_lock(&philos->left_fork->mutex);
-			philos->left_fork->state = IN_USE;
-			if (philo_died(philos) == FALSE)
-			{
-				safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
-						   philos->philo_id, philos->print);
-			}
-		}
+			taking_fork_even(philos);
 		else if (philos->philo_id % 2 == 1)
-		{
-			pthread_mutex_lock(&philos->left_fork->mutex);
-			philos->left_fork->state = IN_USE;
-			if (philo_died(philos) == FALSE)
-			{
-				safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
-						   philos->philo_id, philos->print);
-			}
-			pthread_mutex_lock(&philos->right_fork->mutex);
-			philos->right_fork->state = IN_USE;
-			if (philo_died(philos) == FALSE)
-			{
-				safe_print(TAKEN_FORK, get_time_stamp() - philos->start_time,
-						   philos->philo_id, philos->print);
-			}
-		}
+			taking_fork_odd(philos);
 	}
 }
 
@@ -78,14 +43,7 @@ void	eating(t_philos *philos)
 		pthread_mutex_unlock(&philos->right_fork->mutex);
 		pthread_mutex_lock(&philos->nb_meals_done->mutex);
 		philos->nb_meals_done->state++;
-		if (philos->nb_meals_done->state >= philos->data->nb_meals_todo
-			&& philos->data->nb_meals_todo != -1)
-		{
-			pthread_mutex_lock(&philos->satisfied->mutex);
-			philos->satisfied->state = TRUE;
-			pthread_mutex_unlock(&philos->satisfied->mutex);
-		}
-		pthread_mutex_unlock(&philos->nb_meals_done->mutex);
+		update_philo_satisfaction(philos);
 	}
 	else
 	{
@@ -113,4 +71,16 @@ void	thinking(t_philos *philos)
 			philos->philo_id, philos->print);
 		usleep(1);
 	}
+}
+
+static void	update_philo_satisfaction(t_philos *philos)
+{
+	if (philos->nb_meals_done->state >= philos->data->nb_meals_todo
+			&& philos->data->nb_meals_todo != -1)
+	{
+		pthread_mutex_lock(&philos->satisfied->mutex);
+		philos->satisfied->state = TRUE;
+		pthread_mutex_unlock(&philos->satisfied->mutex);
+	}
+	pthread_mutex_unlock(&philos->nb_meals_done->mutex);
 }

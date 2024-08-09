@@ -66,3 +66,5 @@ void	ft_usleep(int time)
 {
 	usleep(time * 1000);
 }
+
+

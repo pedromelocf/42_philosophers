@@ -103,5 +103,7 @@ void					update_loop(t_diner **diner, int all_satisfied, int *i);
 int						supervisor_check_alive(t_diner **diner, int i);
 void					supervisor_check_satisfied(t_diner **diner,
 							int *all_satisfied, int i);
-
+void				    philo_solo(t_philos *philos);
+void					taking_fork_even(t_philos *philos);
+void					taking_fork_odd(t_philos *philos);
 #endif
