@@ -86,8 +86,8 @@ t_mutex					*init_forks(t_diner *diner);
 int						ft_atoi(const char *nptr);
 void					handle_exit(char *str, int status, int clean,
 							t_diner **diner);
-void					clean_philos(t_diner *diner, int x);
-void					clean_forks(t_diner *diner);
+void					*clean_philos(t_diner *diner, int x);
+void					*clean_forks(t_diner *diner);
 void					dining(t_diner **diner);
 void					*philos_routine(void *arg);
 void					*supervisor_routine(void *arg);

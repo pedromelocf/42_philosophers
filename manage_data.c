@@ -73,12 +73,12 @@ void	clean_diner(t_diner **diner)
 	free(*diner);
 }
 
-void clean_philos(t_diner *diner, int x)
+void	*clean_philos(t_diner *diner, int x)
 {
 	int i;
 
 	i = 0;
-	while (i < x)
+	while (i++ < x)
 	{
 		if (diner->philos[i].last_meal)
 		{
@@ -95,21 +95,18 @@ void clean_philos(t_diner *diner, int x)
 			pthread_mutex_destroy(&diner->philos[i].satisfied->mutex);
 			free(diner->philos[i].satisfied);
 		}
-		i++;
 	}
 	free(diner->philos);
-	clean_forks(diner);
+	return (clean_forks(diner));
 }
 
-void	clean_forks(t_diner *diner)
+void	*clean_forks(t_diner *diner)
 {
 	int i;
 
 	i  = 0;
-	while (i < diner->data->nb_philos)
-	{
+	while (i++ < diner->data->nb_philos)
 		pthread_mutex_destroy(&diner->fork[i].mutex);
-		i++;
-	}
 	free(diner->fork);
+	return (NULL);
 }

@@ -1,6 +1,7 @@
 #include "philosophers.h"
 
-static t_mutex *init_mutex();
+static t_mutex *init_mutex(void);
+static void init_philo_data(t_philos *philos, t_diner *diner, int i);
 
 t_mutex	*init_forks(t_diner *diner)
 {
@@ -42,46 +43,42 @@ t_philos	*init_philos(t_diner *diner)
     {
         philos[i].last_meal = init_mutex();
         if (philos[i].last_meal == NULL)
-        {
-            clean_philos(diner, i);
-            return(NULL);
-        }
-        philos[i].last_meal->state = get_time_stamp();
+            return(clean_philos(diner, i));
         philos[i].nb_meals_done = init_mutex();
         if (philos[i].nb_meals_done == NULL)
-        {
-            clean_philos(diner, i);
-            return(NULL);
-        }
-        philos[i].nb_meals_done->state = 0;
+            return(clean_philos(diner, i));
         philos[i].satisfied = init_mutex();
         if (philos[i].satisfied == NULL)
-        {
-            clean_philos(diner, i);
-            return(NULL);
-        }
-        philos[i].satisfied->state = FALSE;
-        philos[i].data = diner->data;
-        philos[i].print = diner->print;
-        philos[i].philo_alive = diner->supervisor;
-        philos[i].start_time = get_time_stamp();
-        philos[i].philo_id = i + 1;
-        if (i == 0)
-        {
-            philos[i].left_fork = &diner->fork[i];
-            philos[i].right_fork = &diner->fork[philos->data->nb_philos - 1];
-        }
-        else
-        {
-            philos[i].left_fork = &diner->fork[i];
-            philos[i].right_fork = &diner->fork[i - 1];
-        }
+            return(clean_philos(diner, i));
+        init_philo_data(philos, diner, i);
         i++;
     }
     return (philos);
 }
 
-static t_mutex *init_mutex()
+static void init_philo_data(t_philos *philos, t_diner *diner, int i)
+{
+    philos[i].last_meal->state = get_time_stamp();
+    philos[i].nb_meals_done->state = 0;
+    philos[i].satisfied->state = FALSE;
+    philos[i].data = diner->data;
+    philos[i].print = diner->print;
+    philos[i].philo_alive = diner->supervisor;
+    philos[i].start_time = get_time_stamp();
+    philos[i].philo_id = i + 1;
+    if (i == 0)
+    {
+        philos[i].left_fork = &diner->fork[i];
+        philos[i].right_fork = &diner->fork[philos->data->nb_philos - 1];
+    }
+    else
+    {
+        philos[i].left_fork = &diner->fork[i];
+        philos[i].right_fork = &diner->fork[i - 1];
+    }
+}
+
+static t_mutex *init_mutex(void)
 {
     t_mutex *mutex;
 

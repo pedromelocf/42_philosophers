@@ -40,11 +40,8 @@ int	supervisor_check_alive(t_diner **diner, int i)
 			(*diner)->philos[i].philo_id, (*diner)->print);
 		return (FALSE);
 	}
-	else
-	{
-		pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);
-		return (TRUE);
-	}
+	pthread_mutex_unlock(&(*diner)->philos[i].last_meal->mutex);
+	return (TRUE);
 }
 
 void	update_loop(t_diner **diner, int all_satisfied, int *i)
