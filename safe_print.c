@@ -42,7 +42,7 @@ static char	*lltoa(long long c)
 	number = c;
 	length = ilen(number);
 	string = calloc(length + 1, sizeof(char));
-	if (!string)
+	if (string == NULL)
 		return (NULL);
 	if (number < 0)
 	{

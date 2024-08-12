@@ -5,7 +5,8 @@ PHILO_INCLUDES = ./philosophers.h
 PHILO_OBJ_PATH = philos_object
 PHILO_OBJ = $(addprefix $(PHILO_OBJ_PATH)/, $(notdir $(PHILO_SRCS:.c=.o)))
 
-PHILO_SRCS = dining.c \
+PHILO_SRCS = clean_utils.c \
+	dining.c \
 	main.c \
 	manage_data.c \
 	manage_data_utils.c \

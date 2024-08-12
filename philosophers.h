@@ -101,7 +101,6 @@ void					ft_usleep(int time);
 void					safe_print(char *message, long int time, short int id,
 							t_mutex *print);
 int						philo_died(t_philos *philos);
-void					input_validations(t_diner **diner);
 int						philo_satisfied(t_philos *philos);
 void					update_loop(t_diner **diner, int all_satisfied, int *i);
 int						supervisor_check_alive(t_diner **diner, int i);
@@ -110,5 +109,4 @@ void					supervisor_check_satisfied(t_diner **diner,
 void					philo_solo(t_philos *philos);
 void					taking_fork_even(t_philos *philos);
 void					taking_fork_odd(t_philos *philos);
-
 #endif
