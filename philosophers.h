@@ -81,9 +81,13 @@ typedef struct s_diner
 }						t_diner;
 
 void					init_diner(t_diner **diner, int argc, char **argv);
+t_philos				*init_philos(t_diner *diner);
+t_mutex					*init_forks(t_diner *diner);
 int						ft_atoi(const char *nptr);
 void					handle_exit(char *str, int status, int clean,
 							t_diner **diner);
+void					clean_philos(t_diner *diner, int x);
+void					clean_forks(t_diner *diner);
 void					dining(t_diner **diner);
 void					*philos_routine(void *arg);
 void					*supervisor_routine(void *arg);
@@ -106,4 +110,5 @@ void					supervisor_check_satisfied(t_diner **diner,
 void					philo_solo(t_philos *philos);
 void					taking_fork_even(t_philos *philos);
 void					taking_fork_odd(t_philos *philos);
+
 #endif

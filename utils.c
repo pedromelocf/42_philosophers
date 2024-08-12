@@ -35,9 +35,23 @@ void	handle_exit(char *str, int status, int clean, t_diner **diner)
 {
 	printf("%s", str);
 	if (clean == 1)
-		clean_diner(diner);
+		free(*diner);
 	if (clean == 2)
 	{
+		free((*diner)->data);
+		free(*diner);
+	}
+	if (clean == 3)
+	{
+		free((*diner)->supervisor);
+		free((*diner)->data);
+		free(*diner);
+	}
+	if (clean == 4)
+	{
+		pthread_mutex_destroy(&(*diner)->supervisor->mutex);
+		free((*diner)->print);
+		free((*diner)->supervisor);
 		free((*diner)->data);
 		free(*diner);
 	}

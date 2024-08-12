@@ -7,13 +7,14 @@ PHILO_OBJ = $(addprefix $(PHILO_OBJ_PATH)/, $(notdir $(PHILO_SRCS:.c=.o)))
 
 PHILO_SRCS = dining.c \
 	main.c \
-	manage_diner.c \
-	philo_utils.c \
+	manage_data.c \
+	manage_data_utils.c \
 	philos.c \
 	routines.c \
 	routines_utils.c \
 	safe_print.c \
-	taking_forks_aux.c
+	taking_forks_aux.c \
+	utils.c
 
 FLAGS = -Wall -Werror -Wextra -pthread -fsanitize=thread
 CC = gcc
