@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   manage_diner.c                                     :+:      :+:    :+:   */
+/*   manage_data.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pmelo-ca <pmelo-ca@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/31 12:43:27 by pmelo-ca          #+#    #+#             */
-/*   Updated: 2024/08/09 17:00:14 by pmelo-ca         ###   ########.fr       */
+/*   Updated: 2024/08/14 14:11:24 by pmelo-ca         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static void	init_data(int argc, char **argv, t_diner **diner);
 static void	init_supervisor_mutex(t_diner **diner);
-static void init_print_mutex(t_diner **diner);
+static void	init_print_mutex(t_diner **diner);
 static void	input_validations(t_diner **diner);
 
 void	init_diner(t_diner **diner, int argc, char **argv)
@@ -56,17 +56,17 @@ static void	init_supervisor_mutex(t_diner **diner)
 	if ((*diner)->supervisor == NULL)
 		handle_exit("Supervisor initialization failed\n", 1, 2, diner);
 	if (pthread_mutex_init(&(*diner)->supervisor->mutex, NULL) != 0)
-		handle_exit("Mutex init failed\n", 1, 3 , diner);
+		handle_exit("Mutex init failed\n", 1, 3, diner);
 	(*diner)->supervisor->alive = TRUE;
 }
 
-static void init_print_mutex(t_diner **diner)
+static void	init_print_mutex(t_diner **diner)
 {
 	(*diner)->print = calloc(1, sizeof(t_mutex));
 	if ((*diner)->print == NULL)
 		handle_exit("Print initialization failed\n", 1, 3, diner);
 	if (pthread_mutex_init(&(*diner)->print->mutex, NULL) != 0)
-		handle_exit("Mutex init failed\n", 1, 4 , diner);
+		handle_exit("Mutex init failed\n", 1, 4, diner);
 }
 
 static void	input_validations(t_diner **diner)
